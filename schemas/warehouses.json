@@ -1,0 +1,139 @@
+{
+  "$id": "https://yourdomain/schemas/warehouse.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Warehouse",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "code": { "type": "string", "minLength": 1, "maxLength": 32 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "description": { "type": ["string", "null"], "maxLength": 1000 },
+    "owner_type": {
+      "type": "string",
+      "enum": ["platform", "brand", "store", "third_party"],
+      "default": "brand",
+      "description": "Controls which entity operates the warehouse"
+    },
+    "brand_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Optional FK → brand.id when owner_type = brand"
+    },
+    "store_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Optional FK → stores.id when owner_type = store"
+    },
+    "address_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → addresses.id"
+    },
+    "contact_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → contacts.id"
+    },
+    "timezone": { "type": "string", "pattern": "^[A-Za-z_\\/]+$" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "temporarily_closed", "inactive"],
+      "default": "draft"
+    },
+    "operational_schedule_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → schedules.id"
+    },
+    "handover_methods": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["pickup", "courier", "linehaul", "vendor_delivery"]
+      },
+      "uniqueItems": true,
+      "minItems": 1
+    },
+    "storage_capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ambient": { "type": "boolean", "default": true },
+        "chilled": { "type": "boolean", "default": false },
+        "frozen": { "type": "boolean", "default": false },
+        "hazmat": { "type": "boolean", "default": false }
+      }
+    },
+    "capacity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pallet_spaces": { "type": ["integer", "null"], "minimum": 0 },
+        "shelf_bins": { "type": ["integer", "null"], "minimum": 0 },
+        "daily_throughput_orders": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "geofence": {
+      "type": ["object", "null"],
+      "description": "GeoJSON geometry of the operational boundary",
+      "properties": {
+        "type": { "type": "string" },
+        "coordinates": {}
+      }
+    },
+    "integrations": {
+      "type": ["object", "null"],
+      "description": "Identifiers for WMS/POS integrations",
+      "additionalProperties": false,
+      "properties": {
+        "wms": { "type": ["string", "null"], "maxLength": 128 },
+        "pos": { "type": ["string", "null"], "maxLength": 128 },
+        "erp": { "type": ["string", "null"], "maxLength": 128 }
+      }
+    },
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "Flexible key-value data",
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["code", "name", "address_id", "timezone", "handover_methods"],
+
+  "allOf": [
+    {
+      "if": { "properties": { "owner_type": { "const": "brand" } } },
+      "then": { "required": ["brand_id"] }
+    },
+    {
+      "if": { "properties": { "owner_type": { "const": "store" } } },
+      "then": { "required": ["store_id"] }
+    }
+  ],
+
+  "x-pg": {
+    "table": "warehouses",
+    "primaryKey": ["id"],
+    "indexes": [
+      { "name": "idx_warehouses_code", "columns": ["code"], "unique": true },
+      { "name": "idx_warehouses_owner_type", "columns": ["owner_type"] },
+      { "name": "idx_warehouses_status", "columns": ["status"] },
+      { "name": "idx_warehouses_geofence_gist", "using": "GIST", "columns": ["geofence"] }
+    ],
+    "foreignKeys": [
+      { "columns": ["brand_id"], "references": { "table": "brands", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["address_id"], "references": { "table": "addresses", "columns": ["id"] }, "onDelete": "RESTRICT" },
+      { "columns": ["contact_id"], "references": { "table": "contacts", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["operational_schedule_id"], "references": { "table": "schedules", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "triggers": [
+      { "name": "trg_warehouses_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}
