@@ -42,7 +42,7 @@
     "image_id": {
       "type": ["string", "null"],
       "format": "uuid",
-      "description": "Optional image reference (media_files.id)."
+      "description": "Optional image reference (media.id)."
     },
 
     "is_active": {
@@ -70,7 +70,7 @@
       },
       {
         "columns": ["image_id"],
-        "references": { "table": "media_files", "columns": ["id"] },
+        "references": { "table": "media", "columns": ["id"] },
         "onUpdate": "CASCADE",
         "onDelete": "SET NULL"
       }

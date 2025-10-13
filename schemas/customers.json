@@ -1,0 +1,53 @@
+{
+  "$id": "https://yourdomain/schemas/customer.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Customer",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "first_name": { "type": ["string", "null"], "maxLength": 120 },
+    "last_name": { "type": ["string", "null"], "maxLength": 120 },
+    "full_name": { "type": ["string", "null"], "maxLength": 240 },
+    "email": { "type": ["string", "null"], "format": "email", "maxLength": 255 },
+    "phone": { "type": ["string", "null"], "pattern": "^\\+?[0-9]{7,15}$" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "blocked"],
+      "default": "active"
+    },
+    "language": { "type": ["string", "null"], "pattern": "^[a-z]{2}(?:-[A-Z]{2})?$" },
+    "timezone": { "type": ["string", "null"], "description": "Customer preferred timezone" },
+    "marketing_opt_in": { "type": "boolean", "default": false },
+    "last_login_at": { "type": ["string", "null"], "format": "date-time" },
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "Flexible key/value store for integration specific attributes",
+      "additionalProperties": true
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["status"],
+
+  "x-pg": {
+    "table": "customers",
+    "primaryKey": ["id"],
+    "unique": [
+      { "columns": ["email"], "where": "email IS NOT NULL" },
+      { "columns": ["phone"], "where": "phone IS NOT NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_customers_email", "columns": ["email"] },
+      { "name": "idx_customers_phone", "columns": ["phone"] },
+      { "name": "idx_customers_status", "columns": ["status"] },
+      { "name": "idx_customers_last_login", "columns": ["last_login_at"] }
+    ],
+    "triggers": [
+      { "name": "trg_customers_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}
