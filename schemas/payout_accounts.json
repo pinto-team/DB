@@ -1,0 +1,87 @@
+{
+  "$id": "https://yourdomain/schemas/payout_account.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Payout Account",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["bank", "wallet", "crypto"],
+      "default": "bank",
+      "description": "Payout method type"
+    },
+    "provider": {
+      "type": ["string", "null"],
+      "maxLength": 100,
+      "description": "Bank or service provider name"
+    },
+    "account_holder_name": { "type": "string", "maxLength": 100 },
+    "account_number": { "type": "string", "maxLength": 64 },
+    "iban": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Z0-9]{15,34}$",
+      "description": "International Bank Account Number"
+    },
+    "swift_code": {
+      "type": ["string", "null"],
+      "pattern": "^[A-Z0-9]{8,11}$",
+      "description": "SWIFT/BIC code (optional)"
+    },
+    "wallet_address": {
+      "type": ["string", "null"],
+      "maxLength": 255,
+      "description": "Crypto or e-wallet address"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Currency for payouts"
+    },
+    "is_default": { "type": "boolean", "default": false },
+    "status": {
+      "type": "string",
+      "enum": ["pending_verification", "verified", "rejected", "inactive"],
+      "default": "pending_verification"
+    },
+    "verified_at": { "type": ["string", "null"], "format": "date-time" },
+    "verified_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "type", "account_holder_name", "account_number", "currency"],
+
+  "x-pg": {
+    "table": "payout_accounts",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "iban"], "where": "iban IS NOT NULL" },
+      { "columns": ["store_id", "account_number", "currency"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_payout_store", "columns": ["store_id"] },
+      { "name": "idx_payout_status", "columns": ["status"] },
+      { "name": "idx_payout_currency", "columns": ["currency"] },
+      { "name": "idx_payout_is_default", "columns": ["is_default"] }
+    ],
+    "triggers": [
+      { "name": "trg_payout_accounts_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

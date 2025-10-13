@@ -1,0 +1,72 @@
+{
+  "$id": "https://yourdomain/schemas/schedule_rule.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schedule Rule",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "schedule_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → schedules.id"
+    },
+    "day": {
+      "type": "string",
+      "enum": ["sat", "sun", "mon", "tue", "wed", "thu", "fri"],
+      "description": "Day of the week"
+    },
+    "start": {
+      "type": "string",
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "Start time (HH:mm)"
+    },
+    "end": {
+      "type": "string",
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "End time (HH:mm)"
+    },
+    "is_closed": { "type": "boolean", "default": false },
+    "priority": { "type": "integer", "default": 0, "minimum": 0 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "schedule_id", "day", "start", "end"],
+
+  "x-pg": {
+    "table": "schedule_rules",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["schedule_id"],
+        "references": { "table": "schedules", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["schedule_id", "day", "start", "end"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_schedule_rules_store", "columns": ["store_id"] },
+      { "name": "idx_schedule_rules_schedule", "columns": ["schedule_id"] },
+      { "name": "idx_schedule_rules_day", "columns": ["day"] },
+      { "name": "idx_schedule_rules_priority", "columns": ["priority"] }
+    ],
+    "triggers": [
+      { "name": "trg_schedule_rules_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

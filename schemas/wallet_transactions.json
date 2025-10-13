@@ -1,0 +1,54 @@
+{
+  "$id": "https://yourdomain/schemas/commerce/wallet_transactions.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WalletTransaction",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "wallet_id": { "type": "string", "format": "uuid" },
+    "related_transaction_id": { "type": ["string", "null"], "format": "uuid" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "order_income",
+        "refund",
+        "commission_fee",
+        "service_fee",
+        "adjustment",
+        "payout",
+        "bonus_credit",
+        "penalty_debit"
+      ]
+    },
+    "direction": { "type": "string", "enum": ["credit", "debit"] },
+    "amount": { "type": "number", "minimum": 0 },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "source": { "type": "string", "enum": ["system", "manual", "integration"], "default": "system" },
+    "reference": { "type": ["string", "null"], "maxLength": 120 },
+    "notes": { "type": ["string", "null"], "maxLength": 500 },
+    "status": { "type": "string", "enum": ["pending", "completed", "failed"], "default": "pending" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["wallet_id", "type", "direction", "amount", "currency", "status"],
+
+  "x-pg": {
+    "table": "wallet_transactions",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["wallet_id"], "references": { "table": "wallets", "columns": ["id"] }, "onDelete": "CASCADE" }
+    ],
+    "indexes": [
+      { "name": "idx_wallet_tx_wallet", "columns": ["wallet_id"] },
+      { "name": "idx_wallet_tx_type", "columns": ["type"] },
+      { "name": "idx_wallet_tx_status", "columns": ["status"] }
+    ],
+    "triggers": [
+      { "name": "trg_wallet_tx_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$id": "https://yourdomain/schemas/menu_section.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Menu Section",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "menu_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → menus.id"
+    },
+    "name": { "type": "string", "minLength": 1, "description": "Section name" },
+    "description": { "type": ["string", "null"], "maxLength": 500 },
+    "display_order": { "type": "integer", "minimum": 0, "default": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "menu_id", "name", "status"],
+
+  "x-pg": {
+    "table": "menu_sections",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["menu_id"],
+        "references": { "table": "menus", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["menu_id", "name"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_menu_sections_store", "columns": ["store_id"] },
+      { "name": "idx_menu_sections_menu", "columns": ["menu_id"] },
+      { "name": "idx_menu_sections_status", "columns": ["status"] },
+      { "name": "idx_menu_sections_display_order", "columns": ["display_order"] }
+    ],
+    "triggers": [
+      { "name": "trg_menu_sections_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ],
+    "relations": {
+      "belongsTo": [
+        { "table": "menus", "fk": ["menu_id"] }
+      ],
+      "hasMany": [
+        { "table": "items", "fk": ["section_id"] }
+      ]
+    }
+  }
+}

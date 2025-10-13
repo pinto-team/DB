@@ -1,0 +1,71 @@
+{
+  "$id": "https://yourdomain/schemas/menu.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Menu",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "branch_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → branches.id (optional, branch-specific menus)"
+    },
+    "name": { "type": "string", "minLength": 1, "description": "Menu name" },
+    "description": { "type": ["string", "null"], "maxLength": 500 },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "default": "IRR"
+    },
+    "is_public": { "type": "boolean", "default": true },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "archived"],
+      "default": "draft"
+    },
+    "effective_from": { "type": ["string", "null"], "format": "date-time" },
+    "effective_to": { "type": ["string", "null"], "format": "date-time" },
+    "version": { "type": "integer", "default": 1, "minimum": 1 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "name", "currency", "status"],
+
+  "x-pg": {
+    "table": "menus",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["branch_id"],
+        "references": { "table": "branches", "columns": ["id"] },
+        "onDelete": "SET NULL"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "name", "version"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_menus_store", "columns": ["store_id"] },
+      { "name": "idx_menus_branch", "columns": ["branch_id"] },
+      { "name": "idx_menus_status", "columns": ["status"] },
+      { "name": "idx_menus_is_public", "columns": ["is_public"] }
+    ],
+    "triggers": [
+      { "name": "trg_menus_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

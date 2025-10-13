@@ -1,0 +1,86 @@
+{
+  "$id": "https://yourdomain/schemas/category.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Category",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+
+    "name": {
+      "type": "object",
+      "description": "Localized category name (multi-locale).",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "description": {
+      "type": ["object", "null"],
+      "description": "Localized category description.",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "parent_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Self-referencing parent category (categories.id)."
+    },
+
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 160,
+      "description": "Globally unique slug for SEO."
+    },
+
+    "sort_index": {
+      "type": "integer",
+      "default": 0,
+      "description": "Ordering index for display."
+    },
+
+    "image_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Optional image reference (media_files.id)."
+    },
+
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether this category is visible/active."
+    },
+
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "slug"],
+
+  "x-pg": {
+    "table": "categories",
+    "primaryKey": ["id"],
+    "unique": [{ "columns": ["slug"] }],
+    "foreignKeys": [
+      {
+        "columns": ["parent_id"],
+        "references": { "table": "categories", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "SET NULL"
+      },
+      {
+        "columns": ["image_id"],
+        "references": { "table": "media_files", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "SET NULL"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_active_categories", "columns": ["is_active"] },
+      { "name": "idx_category_parent", "columns": ["parent_id"] }
+    ],
+    "triggers": [
+      { "name": "trg_categories_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

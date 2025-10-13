@@ -1,0 +1,75 @@
+{
+  "$id": "https://yourdomain/schemas/contact.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Contact",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["main", "support", "manager", "other"],
+      "default": "other"
+    },
+    "email": {
+      "type": ["string", "null"],
+      "format": "email",
+      "maxLength": 255
+    },
+    "website": {
+      "type": ["string", "null"],
+      "format": "uri"
+    },
+    "social": {
+      "type": ["array", "null"],
+      "description": "List of social media links",
+      "items": {
+        "type": "object",
+        "properties": {
+          "platform": { "type": "string" },
+          "url": { "type": ["string", "null"], "format": "uri" }
+        },
+        "required": ["platform"],
+        "additionalProperties": false
+      }
+    },
+    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "type", "status"],
+
+  "x-pg": {
+    "table": "contacts",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_contacts_store", "columns": ["store_id"] },
+      { "name": "idx_contacts_type", "columns": ["type"] },
+      { "name": "idx_contacts_status", "columns": ["status"] },
+      { "name": "idx_contacts_email", "expression": "lower(email)" }
+    ],
+    "triggers": [
+      { "name": "trg_contacts_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

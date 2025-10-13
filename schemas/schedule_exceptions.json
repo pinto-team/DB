@@ -1,0 +1,80 @@
+{
+  "$id": "https://yourdomain/schemas/schedule_exception.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Schedule Exception",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "schedule_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → schedules.id"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "Exception date (YYYY-MM-DD)"
+    },
+    "start": {
+      "type": ["string", "null"],
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "Optional start time (HH:mm)"
+    },
+    "end": {
+      "type": ["string", "null"],
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "Optional end time (HH:mm)"
+    },
+    "is_closed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Marks the store as closed during this exception"
+    },
+    "reason": {
+      "type": ["string", "null"],
+      "maxLength": 255,
+      "description": "Reason for the exception (e.g., maintenance, holiday)"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "schedule_id", "date", "is_closed"],
+
+  "x-pg": {
+    "table": "schedule_exceptions",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["schedule_id"],
+        "references": { "table": "schedules", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["schedule_id", "date"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_schedule_exceptions_store", "columns": ["store_id"] },
+      { "name": "idx_schedule_exceptions_schedule", "columns": ["schedule_id"] },
+      { "name": "idx_schedule_exceptions_date", "columns": ["date"] },
+      { "name": "idx_schedule_exceptions_is_closed", "columns": ["is_closed"] }
+    ],
+    "triggers": [
+      { "name": "trg_schedule_exceptions_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

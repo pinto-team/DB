@@ -1,0 +1,72 @@
+{
+  "$id": "https://yourdomain/schemas/brand.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Brand",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+
+    "name": {
+      "type": "object",
+      "description": "Localized brand name (multi-locale).",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "description": {
+      "type": ["object", "null"],
+      "description": "Localized description.",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "website_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "maxLength": 255,
+      "description": "Official website of the brand."
+    },
+
+    "logo_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "Reference to logo media file (media_files.id)."
+    },
+
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 160,
+      "description": "Globally unique SEO-friendly slug."
+    },
+
+    "is_active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether the brand is active."
+    },
+
+    "social_links": {
+      "type": ["object", "null"],
+      "description": "Map of social media links (e.g. {\"instagram\": \"https://...\"}).",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "slug"],
+
+  "x-pg": {
+    "table": "brands",
+    "primaryKey": ["id"],
+    "unique": [{ "columns": ["slug"] }],
+    "indexes": [
+      { "name": "idx_active_brands", "columns": ["is_active"] }
+    ],
+    "triggers": [
+      { "name": "trg_brands_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

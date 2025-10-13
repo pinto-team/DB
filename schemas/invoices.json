@@ -1,0 +1,49 @@
+{
+  "$id": "https://yourdomain/schemas/commerce/invoices.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Invoice",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": { "type": "string", "format": "uuid" },
+    "settlement_id": { "type": ["string", "null"], "format": "uuid" },
+    "invoice_number": { "type": "string", "maxLength": 50 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "due_at": { "type": ["string", "null"], "format": "date-time" },
+    "amount": { "type": "number", "minimum": 0 },
+    "tax_amount": { "type": "number", "minimum": 0 },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "pdf_url": { "type": ["string", "null"], "format": "uri" },
+    "status": {
+      "type": "string",
+      "enum": ["issued", "sent", "paid", "cancelled"],
+      "default": "issued"
+    },
+    "notes": { "type": ["string", "null"], "maxLength": 500 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "invoice_number", "issued_at", "amount", "currency", "status"],
+
+  "x-pg": {
+    "table": "invoices",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["settlement_id"], "references": { "table": "settlements", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_invoices_store", "columns": ["store_id"] },
+      { "name": "idx_invoices_status", "columns": ["status"] },
+      { "name": "idx_invoices_number", "columns": ["invoice_number"] }
+    ],
+    "unique": [{ "columns": ["invoice_number"] }],
+    "triggers": [
+      { "name": "trg_invoices_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

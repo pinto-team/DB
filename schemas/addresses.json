@@ -1,0 +1,83 @@
+{
+  "$id": "https://yourdomain/schemas/address.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Address",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "country_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → countries.id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["main_office", "branch", "warehouse", "other"],
+      "default": "other"
+    },
+    "label": { "type": "string", "minLength": 1, "description": "Address label (e.g., Main Office)" },
+    "levels": {
+      "type": ["array", "null"],
+      "description": "Administrative levels (province, city, district, etc.)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string" },
+          "code": { "type": ["string", "null"], "maxLength": 16 }
+        },
+        "required": ["level", "name"],
+        "additionalProperties": false
+      }
+    },
+    "street": { "type": "string" },
+    "postal_code": { "type": ["string", "null"], "maxLength": 20 },
+    "latitude": { "type": ["number", "null"], "minimum": -90, "maximum": 90 },
+    "longitude": { "type": ["number", "null"], "minimum": -180, "maximum": 180 },
+    "full_address": { "type": ["string", "null"], "description": "Precomputed concatenated address" },
+    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["country_id", "type", "label", "street", "status"],
+
+  "x-pg": {
+    "table": "addresses",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["country_id"],
+        "references": { "table": "countries", "columns": ["id"] },
+        "onDelete": "RESTRICT"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_addresses_country", "columns": ["country_id"] },
+      { "name": "idx_addresses_store", "columns": ["store_id"] },
+      { "name": "idx_addresses_status", "columns": ["status"] },
+      { "name": "idx_addresses_geo", "using": "GIST", "expression": "ll_to_earth(latitude, longitude)" }
+    ],
+    "triggers": [
+      { "name": "trg_addresses_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

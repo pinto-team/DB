@@ -1,0 +1,72 @@
+{
+  "$id": "https://yourdomain/schemas/compliance_document.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Compliance Document",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["business_license", "food_safety", "tax_certificate", "identity", "health_certificate", "contract", "other"],
+      "description": "Document type"
+    },
+    "media_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → media.id"
+    },
+    "number": {
+      "type": "string",
+      "maxLength": 64,
+      "description": "Document number or identifier"
+    },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" },
+    "status": {
+      "type": "string",
+      "enum": ["uploaded", "verified", "rejected"],
+      "default": "uploaded"
+    },
+    "notes": { "type": ["string", "null"], "maxLength": 500 },
+    "verified_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "verified_at": { "type": ["string", "null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "type", "media_id", "number", "issued_at"],
+
+  "x-pg": {
+    "table": "compliance_documents",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["media_id"],
+        "references": { "table": "media", "columns": ["id"] },
+        "onDelete": "RESTRICT"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_compliance_store", "columns": ["store_id"] },
+      { "name": "idx_compliance_type", "columns": ["type"] },
+      { "name": "idx_compliance_status", "columns": ["status"] },
+      { "name": "idx_compliance_expires", "columns": ["expires_at"] }
+    ],
+    "triggers": [
+      { "name": "trg_compliance_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

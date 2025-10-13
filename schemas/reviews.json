@@ -1,0 +1,76 @@
+{
+  "$id": "https://yourdomain/schemas/shared/reviews.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Review",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+
+    "store_id": { "type": "string", "format": "uuid", "description": "FK → stores.id" },
+    "branch_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → branches.id" },
+    "order_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → orders.id" },
+    "user_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → customers.id" },
+
+    "rating": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "multipleOf": 0.5,
+      "description": "Rating value (0–5)"
+    },
+
+    "title": { "type": ["string", "null"], "maxLength": 120 },
+    "comment": { "type": ["string", "null"], "maxLength": 2000 },
+
+    "reply": {
+      "type": ["object", "null"],
+      "properties": {
+        "comment": { "type": "string", "maxLength": 2000 },
+        "replied_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+
+    "flags": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "string",
+        "enum": ["inappropriate", "spam", "resolved"]
+      },
+      "uniqueItems": true
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["pending", "approved", "rejected"],
+      "default": "pending"
+    },
+
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "rating", "status"],
+
+  "x-pg": {
+    "table": "reviews",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["order_id"], "references": { "table": "orders", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["user_id"], "references": { "table": "customers", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_reviews_store", "columns": ["store_id"] },
+      { "name": "idx_reviews_status", "columns": ["status"] },
+      { "name": "idx_reviews_rating", "columns": ["rating"] }
+    ],
+    "triggers": [
+      { "name": "trg_reviews_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

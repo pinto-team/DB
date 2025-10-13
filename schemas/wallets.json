@@ -1,0 +1,77 @@
+{
+  "$id": "https://yourdomain/schemas/wallet.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Wallet",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "currency": {
+      "type": "string",
+      "pattern": "^[A-Z]{3}$",
+      "description": "Wallet currency code (e.g., IRR, USD)"
+    },
+    "balance": {
+      "type": "number",
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "default": 0,
+      "description": "Current wallet balance"
+    },
+    "pending_balance": {
+      "type": "number",
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "default": 0,
+      "description": "Pending transactions not yet settled"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "suspended", "closed"],
+      "default": "active"
+    },
+    "last_transaction_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → wallet_transactions.id"
+    },
+    "last_transaction_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "currency", "status"],
+
+  "x-pg": {
+    "table": "wallets",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "currency"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_wallets_store", "columns": ["store_id"] },
+      { "name": "idx_wallets_status", "columns": ["status"] },
+      { "name": "idx_wallets_currency", "columns": ["currency"] }
+    ],
+    "triggers": [
+      { "name": "trg_wallets_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

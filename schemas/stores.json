@@ -1,0 +1,98 @@
+{
+  "$id": "https://yourdomain/schemas/store.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Store",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "name": { "type": "string", "minLength": 1 },
+    "legal_name": { "type": ["string", "null"] },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 160
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending_review", "approved", "rejected", "active", "paused", "suspended", "closed"],
+      "default": "draft"
+    },
+    "description": { "type": ["string", "null"] },
+    "cuisines": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "tags": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "country_id": { "type": ["string", "null"], "format": "uuid" },
+    "address_id": { "type": ["string", "null"], "format": "uuid" },
+    "contact_id": { "type": ["string", "null"], "format": "uuid" },
+    "default_currency": { "type": "string", "pattern": "^[A-Z]{3}$", "default": "IRR" },
+    "logo_media_id": { "type": ["string", "null"], "format": "uuid" },
+    "banner_media_id": { "type": ["string", "null"], "format": "uuid" },
+    "pos_integration_id": { "type": ["string", "null"], "format": "uuid" },
+    "commission_id": { "type": ["string", "null"], "format": "uuid" },
+    "payout_account_id": { "type": ["string", "null"], "format": "uuid" },
+    "store_settings_id": { "type": ["string", "null"], "format": "uuid" },
+    "default_branch_id": { "type": ["string", "null"], "format": "uuid" },
+    "wallet_id": { "type": ["string", "null"], "format": "uuid" },
+    "timezone": { "type": "string", "default": "Asia/Tehran" },
+
+    "rating_summary": {
+      "type": ["object", "null"],
+      "properties": {
+        "avg_rating": { "type": ["number", "null"], "minimum": 0, "maximum": 5 },
+        "total_reviews": { "type": ["integer", "null"], "minimum": 0 },
+        "last_rated_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+
+    "financial_summary": {
+      "type": ["object", "null"],
+      "properties": {
+        "current_balance": { "type": ["number", "null"], "minimum": 0 },
+        "currency": { "type": ["string", "null"], "pattern": "^[A-Z]{3}$" },
+        "last_settlement_id": { "type": ["string", "null"], "format": "uuid" },
+        "last_settlement_at": { "type": ["string", "null"], "format": "date-time" },
+        "last_payout_request_id": { "type": ["string", "null"], "format": "uuid" }
+      },
+      "additionalProperties": false
+    },
+
+    "created_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "owner_user_id": { "type": ["string", "null"], "format": "uuid" },
+
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "status", "default_currency"],
+
+  "x-pg": {
+    "table": "stores",
+    "primaryKey": ["id"],
+    "unique": [{ "columns": ["slug"], "where": "slug IS NOT NULL" }],
+    "indexes": [
+      { "name": "idx_stores_status", "columns": ["status"] },
+      { "name": "idx_stores_country", "columns": ["country_id"] },
+      { "name": "idx_stores_owner", "columns": ["owner_user_id"] }
+    ],
+    "foreignKeys": [
+      { "columns": ["country_id"], "references": { "table": "countries", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["address_id"], "references": { "table": "addresses", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["contact_id"], "references": { "table": "contacts", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["wallet_id"], "references": { "table": "wallets", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "triggers": [
+      { "name": "trg_stores_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

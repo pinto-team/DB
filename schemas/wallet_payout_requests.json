@@ -1,0 +1,45 @@
+{
+  "$id": "https://yourdomain/schemas/commerce/wallet_payout_requests.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WalletPayoutRequest",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "wallet_id": { "type": "string", "format": "uuid" },
+    "payout_account_id": { "type": "string", "format": "uuid" },
+    "amount": { "type": "number", "minimum": 0 },
+    "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "approved", "rejected", "processing", "completed", "failed"],
+      "default": "pending"
+    },
+    "requested_at": { "type": "string", "format": "date-time" },
+    "processed_at": { "type": ["string", "null"], "format": "date-time" },
+    "processed_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "notes": { "type": ["string", "null"], "maxLength": 500 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["wallet_id", "payout_account_id", "amount", "currency", "status"],
+
+  "x-pg": {
+    "table": "wallet_payout_requests",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["wallet_id"], "references": { "table": "wallets", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["payout_account_id"], "references": { "table": "payout_accounts", "columns": ["id"] }, "onDelete": "CASCADE" }
+    ],
+    "indexes": [
+      { "name": "idx_wallet_payout_wallet", "columns": ["wallet_id"] },
+      { "name": "idx_wallet_payout_status", "columns": ["status"] }
+    ],
+    "triggers": [
+      { "name": "trg_wallet_payout_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

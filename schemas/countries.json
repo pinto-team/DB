@@ -1,0 +1,57 @@
+{
+  "$id": "https://yourdomain/schemas/country.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Country",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "name": { "type": "string", "minLength": 1, "description": "Country name (e.g., Iran)" },
+    "iso_code": {
+      "type": "string",
+      "pattern": "^[A-Z]{2,3}$",
+      "description": "ISO country code (e.g., IR)"
+    },
+    "admin_levels": {
+      "type": ["array", "null"],
+      "description": "Administrative divisions (e.g., province, city)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "level": { "type": "integer", "minimum": 1 },
+          "name": { "type": "string" },
+          "code": { "type": ["string", "null"], "maxLength": 16 }
+        },
+        "required": ["level", "name"],
+        "additionalProperties": false
+      }
+    },
+    "timezones": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "description": "List of valid timezones"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "iso_code"],
+
+  "x-pg": {
+    "table": "countries",
+    "primaryKey": ["id"],
+    "unique": [
+      { "columns": ["iso_code"] },
+      { "columns": ["lower(name)"] }
+    ],
+    "indexes": [
+      { "name": "idx_countries_iso", "columns": ["iso_code"] },
+      { "name": "idx_countries_name", "expression": "lower(name)" }
+    ],
+    "triggers": [
+      { "name": "trg_countries_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

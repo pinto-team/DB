@@ -1,0 +1,78 @@
+{
+  "$id": "https://yourdomain/schemas/modifier_group.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Modifier Group",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "name": { "type": "string", "minLength": 1, "description": "Group name" },
+    "selection_type": {
+      "type": "string",
+      "enum": ["single", "multiple"],
+      "default": "single"
+    },
+    "min_select": { "type": "integer", "minimum": 0, "default": 0 },
+    "max_select": { "type": ["integer", "null"], "minimum": 1 },
+    "required": { "type": "boolean", "default": false },
+
+    "modifiers": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "price_delta": { "type": "number", "minimum": 0, "multipleOf": 0.01 },
+          "is_default": { "type": "boolean", "default": false },
+          "sku": { "type": ["string", "null"] }
+        },
+        "required": ["id", "name", "price_delta"]
+      }
+    },
+
+    "display_order": { "type": "integer", "default": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "name", "selection_type", "status"],
+
+  "x-pg": {
+    "table": "modifier_groups",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" }
+    ],
+    "indexes": [
+      { "name": "idx_modifier_groups_store", "columns": ["store_id"] },
+      { "name": "idx_modifier_groups_status", "columns": ["status"] },
+      { "name": "idx_modifier_groups_display_order", "columns": ["display_order"] }
+    ],
+    "unique": [
+      { "columns": ["store_id", "name"], "where": "deleted_at IS NULL" }
+    ],
+    "triggers": [
+      { "name": "trg_modifier_groups_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ],
+    "relations": {
+      "hasMany": [
+        { "table": "items", "fk": ["modifier_group_ids"] }
+      ]
+    }
+  }
+}

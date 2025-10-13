@@ -1,0 +1,62 @@
+{
+  "$id": "https://yourdomain/schemas/orders/orders.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Order",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id":           { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id":     { "type": "string", "format": "uuid" },
+    "customer_id":  { "type": "string", "format": "uuid" },
+    "branch_id":    { "type": ["string","null"], "format": "uuid" },
+    "cart_id":      { "type": ["string","null"], "format": "uuid" },
+    "order_number": { "type": "string", "maxLength": 40 },
+    "currency":     { "type": "string", "pattern": "^[A-Z]{3}$", "default": "IRR" },
+    "subtotal":     { "type": "number", "minimum": 0 },
+    "discount_total": { "type": "number", "minimum": 0 },
+    "tax_total":    { "type": "number", "minimum": 0 },
+    "delivery_fee": { "type": "number", "minimum": 0 },
+    "grand_total":  { "type": "number", "minimum": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["pending","confirmed","preparing","out_for_delivery","delivered","cancelled","refunded"],
+      "default": "pending"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": ["unpaid","paid","refunded","failed"],
+      "default": "unpaid"
+    },
+    "delivery_method": {
+      "type": "string",
+      "enum": ["delivery","pickup"],
+      "default": "delivery"
+    },
+    "delivery_address_id": { "type": ["string","null"], "format": "uuid" },
+    "notes": { "type": ["string","null"], "maxLength": 1000 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string","null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id","customer_id","currency","status","payment_status"],
+
+  "x-pg": {
+    "table": "orders",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns":["store_id"],"references":{"table":"stores","columns":["id"]},"onDelete":"CASCADE" },
+      { "columns":["customer_id"],"references":{"table":"customers","columns":["id"]},"onDelete":"CASCADE" }
+    ],
+    "indexes":[
+      { "name":"idx_orders_store","columns":["store_id"] },
+      { "name":"idx_orders_customer","columns":["customer_id"] },
+      { "name":"idx_orders_status","columns":["status"] }
+    ],
+    "unique":[{ "columns":["order_number"] }],
+    "triggers":[
+      { "name":"trg_orders_set_updated_at","timing":"BEFORE","event":"UPDATE","function":"set_updated_at()" }
+    ]
+  }
+}

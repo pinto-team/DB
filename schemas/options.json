@@ -1,0 +1,44 @@
+{
+  "$id": "https://yourdomain/schemas/option.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Option",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "name": {
+      "type": "object",
+      "description": "Localized display name",
+      "additionalProperties": { "type": "string" }
+    },
+    "description": {
+      "type": ["object", "null"],
+      "description": "Localized description",
+      "additionalProperties": { "type": "string" }
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 160,
+      "description": "Globally unique slug"
+    },
+    "sort_index": { "type": "integer", "default": 0 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "slug"],
+
+  "x-pg": {
+    "table": "options",
+    "primaryKey": ["id"],
+    "unique": [{ "columns": ["slug"] }],
+    "indexes": [
+      { "name": "idx_options_sort", "columns": ["sort_index"] }
+    ],
+    "triggers": [
+      { "name": "trg_options_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

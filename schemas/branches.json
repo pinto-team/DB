@@ -1,0 +1,93 @@
+{
+  "$id": "https://yourdomain/schemas/branch.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Branch",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "name": { "type": "string", "minLength": 1, "description": "Branch name" },
+    "code": { "type": "string", "maxLength": 50, "description": "Branch code or identifier" },
+    "address_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → addresses.id"
+    },
+    "contact_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → contacts.id"
+    },
+    "geo": {
+      "type": "object",
+      "description": "Branch location coordinates",
+      "properties": {
+        "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+        "longitude": { "type": "number", "minimum": -180, "maximum": 180 }
+      },
+      "required": ["latitude", "longitude"],
+      "additionalProperties": false
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "pending_review", "active", "temporarily_closed", "permanently_closed", "under_maintenance", "suspended"],
+      "default": "draft"
+    },
+    "operational": {
+      "type": ["object", "null"],
+      "description": "Operational status and performance info",
+      "properties": {
+        "is_online": { "type": "boolean", "default": true },
+        "accepting_orders": { "type": "boolean", "default": true },
+        "prep_time_minutes": { "type": "integer", "minimum": 0, "default": 10 },
+        "is_auto_paused": { "type": "boolean", "default": false }
+      },
+      "additionalProperties": false
+    },
+    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "name", "address_id", "geo", "status"],
+
+  "x-pg": {
+    "table": "branches",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["address_id"],
+        "references": { "table": "addresses", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["contact_id"],
+        "references": { "table": "contacts", "columns": ["id"] },
+        "onDelete": "SET NULL"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "code"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_branches_store", "columns": ["store_id"] },
+      { "name": "idx_branches_status", "columns": ["status"] },
+      { "name": "idx_branches_geo", "using": "GIST", "expression": "ll_to_earth((geo->>'latitude')::float, (geo->>'longitude')::float)" }
+    ],
+    "triggers": [
+      { "name": "trg_branches_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

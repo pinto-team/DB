@@ -1,0 +1,84 @@
+{
+  "$id": "https://yourdomain/schemas/shared/media.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Media",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+
+    "store_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+
+    "type": {
+      "type": "string",
+      "enum": ["image", "video", "document"],
+      "default": "image"
+    },
+
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "maxLength": 2048,
+      "description": "Full URL of the media file"
+    },
+
+    "alt": {
+      "type": ["string", "null"],
+      "maxLength": 255,
+      "description": "Alternative text for accessibility"
+    },
+
+    "content_type": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "MIME type (e.g., image/jpeg)"
+    },
+
+    "file_size": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "File size in bytes"
+    },
+
+    "width": { "type": ["integer", "null"], "minimum": 0 },
+    "height": { "type": ["integer", "null"], "minimum": 0 },
+
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+
+    "created_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["type", "url", "content_type", "status"],
+
+  "x-pg": {
+    "table": "media",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "SET NULL"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_media_store", "columns": ["store_id"] },
+      { "name": "idx_media_type", "columns": ["type"] },
+      { "name": "idx_media_status", "columns": ["status"] }
+    ],
+    "triggers": [
+      { "name": "trg_media_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

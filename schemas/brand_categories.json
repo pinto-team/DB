@@ -1,0 +1,68 @@
+{
+  "$id": "https://yourdomain/schemas/brand_categories.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BrandCategory",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "brand_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the brand (brands.id)."
+    },
+    "category_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the category (categories.id)."
+    },
+    "priority": {
+      "type": "integer",
+      "default": 0,
+      "description": "Optional sort priority of brand within the category."
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marks if brand is highlighted in this category (e.g., featured on top)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+    }
+  },
+
+  "required": ["brand_id", "category_id"],
+
+  "x-pg": {
+    "table": "brand_categories",
+    "primaryKey": ["brand_id", "category_id"],
+    "foreignKeys": [
+      {
+        "columns": ["brand_id"],
+        "references": { "table": "brands", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["category_id"],
+        "references": { "table": "categories", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "CASCADE"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_brand_categories_category", "columns": ["category_id"] },
+      { "name": "idx_brand_categories_featured", "columns": ["is_featured"] }
+    ],
+    "triggers": [
+      {
+        "name": "trg_brand_categories_set_created_at",
+        "timing": "BEFORE",
+        "event": "INSERT",
+        "function": "set_created_at()"
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "$id": "https://yourdomain/schemas/orders/order_status_history.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderStatusHistory",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id":         { "type": "string", "format": "uuid", "readOnly": true },
+    "order_id":   { "type": "string", "format": "uuid" },
+    "from_status":{ "type": ["string","null"], "enum": ["pending","confirmed","preparing","out_for_delivery","delivered","cancelled","refunded"] },
+    "to_status":  { "type": "string", "enum": ["pending","confirmed","preparing","out_for_delivery","delivered","cancelled","refunded"] },
+    "changed_by_user_id": { "type": ["string","null"], "format": "uuid" },
+    "changed_at": { "type": "string", "format": "date-time" },
+    "notes":      { "type": ["string","null"], "maxLength": 500 }
+  },
+
+  "required": ["order_id","to_status","changed_at"],
+
+  "x-pg": {
+    "table": "order_status_history",
+    "primaryKey": ["id"],
+    "foreignKeys":[
+      { "columns":["order_id"],"references":{"table":"orders","columns":["id"]},"onDelete":"CASCADE" }
+    ],
+    "indexes":[
+      { "name":"idx_order_status_order","columns":["order_id"] },
+      { "name":"idx_order_status_to","columns":["to_status"] }
+    ]
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$id": "https://yourdomain/schemas/phone.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Phone",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "contact_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → contacts.id"
+    },
+    "label": { "type": "string", "minLength": 1, "description": "Label (e.g., Support, Sales)" },
+    "country_code": {
+      "type": ["string", "null"],
+      "pattern": "^\\+[0-9]{1,4}$",
+      "description": "E.164 country code (e.g., +98)"
+    },
+    "number": {
+      "type": "string",
+      "pattern": "^[0-9]{5,15}$",
+      "description": "Phone number (digits only)"
+    },
+    "is_primary": { "type": "boolean", "default": false },
+    "type": {
+      "type": "string",
+      "enum": ["mobile", "landline", "whatsapp", "support", "manager", "fax", "emergency", "sales"],
+      "default": "mobile"
+    },
+    "is_verified": { "type": "boolean", "default": false },
+    "verified_at": { "type": ["string", "null"], "format": "date-time" },
+    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive", "suspended"],
+      "default": "active"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "label", "number", "type", "status"],
+
+  "x-pg": {
+    "table": "phones",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["contact_id"],
+        "references": { "table": "contacts", "columns": ["id"] },
+        "onDelete": "SET NULL"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "number", "type"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_phones_store", "columns": ["store_id"] },
+      { "name": "idx_phones_contact", "columns": ["contact_id"] },
+      { "name": "idx_phones_type", "columns": ["type"] },
+      { "name": "idx_phones_status", "columns": ["status"] },
+      { "name": "idx_phones_is_primary", "columns": ["is_primary"] }
+    ],
+    "triggers": [
+      { "name": "trg_phones_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

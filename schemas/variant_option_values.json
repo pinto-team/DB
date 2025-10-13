@@ -1,0 +1,64 @@
+{
+  "$id": "https://yourdomain/schemas/variant_option_value.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Variant Option Value",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "variant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → product_variants.id"
+    },
+    "option_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → options.id"
+    },
+    "option_value_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → option_values.id"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["variant_id", "option_value_id"],
+
+  "x-pg": {
+    "table": "variant_option_values",
+    "primaryKey": ["variant_id", "option_id"],
+    "foreignKeys": [
+      {
+        "columns": ["variant_id"],
+        "references": { "table": "product_variants", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["option_id"],
+        "references": { "table": "options", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["option_value_id"],
+        "references": { "table": "option_values", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["variant_id", "option_value_id"] }
+    ],
+    "indexes": [
+      { "name": "idx_vov_variant", "columns": ["variant_id"] },
+      { "name": "idx_vov_option", "columns": ["option_id"] },
+      { "name": "idx_vov_option_value", "columns": ["option_value_id"] }
+    ],
+    "triggers": [
+      { "name": "trg_vov_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" },
+      { "name": "trg_vov_fill_option_id", "timing": "BEFORE", "event": "INSERT", "function": "vov_fill_option_id()" },
+      { "name": "trg_vov_guard_constraints", "timing": "BEFORE", "event": "INSERT OR UPDATE", "function": "vov_guard_constraints()" }
+    ]
+  }
+}

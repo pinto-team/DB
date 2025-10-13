@@ -1,0 +1,54 @@
+{
+  "$id": "https://yourdomain/schemas/product_option_value.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product Option Value",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "product_option_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → product_options.id"
+    },
+    "option_value_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → option_values.id"
+    },
+    "sort_index": { "type": "integer", "default": 0 },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["product_option_id", "option_value_id"],
+
+  "x-pg": {
+    "table": "product_option_values",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["product_option_id"],
+        "references": { "table": "product_options", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["option_value_id"],
+        "references": { "table": "option_values", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["product_option_id", "option_value_id"] }
+    ],
+    "indexes": [
+      { "name": "idx_pov_product_option", "columns": ["product_option_id"] },
+      { "name": "idx_pov_option_value", "columns": ["option_value_id"] },
+      { "name": "idx_pov_sort", "columns": ["product_option_id", "sort_index"] }
+    ],
+    "triggers": [
+      { "name": "trg_pov_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

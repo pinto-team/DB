@@ -1,0 +1,81 @@
+{
+  "$id": "https://yourdomain/schemas/product.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Product (SPU)",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "name": { "type": "string", "minLength": 1 },
+    "full_name": { "type": ["string", "null"] },
+    "description": { "type": ["string", "null"] },
+    "slug": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "maxLength": 160
+    },
+    "brand_id": { "type": ["string", "null"], "format": "uuid" },
+    "category_id": { "type": ["string", "null"], "format": "uuid" },
+    "tags": {
+      "type": ["array", "null"],
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "primary_image_id": { "type": ["string", "null"], "format": "uuid" },
+    "images": { "type": ["array", "null"], "items": { "type": "string", "format": "uuid" } },
+    "videos": { "type": ["array", "null"], "items": { "type": "string", "format": "uuid" } },
+    "seo_metadata": {
+      "type": ["object", "null"],
+      "properties": {
+        "meta_title": { "type": ["string", "null"], "maxLength": 70 },
+        "meta_description": { "type": ["string", "null"], "maxLength": 160 },
+        "keywords": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "uniqueItems": true,
+          "maxItems": 25
+        }
+      }
+    },
+    "i18n": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": { "type": ["string", "null"] },
+          "full_name": { "type": ["string", "null"] },
+          "description": { "type": ["string", "null"] }
+        }
+      },
+      "propertyNames": { "pattern": "^[a-z]{2}(-[A-Z]{2})?$" }
+    },
+    "specs": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+    },
+    "is_active": { "type": "boolean", "default": true },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["name", "is_active"],
+
+  "x-pg": {
+    "table": "products",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["brand_id"], "references": { "table": "brands", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["category_id"], "references": { "table": "categories", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "unique": [{ "columns": ["slug"], "where": "slug IS NOT NULL" }],
+    "indexes": [
+      { "name": "idx_products_tags_gin", "using": "GIN", "expression": "to_tsvector('simple', coalesce(array_to_string(tags, ' '), ''))" },
+      { "name": "idx_products_specs_gin", "using": "GIN", "columns": ["specs"] }
+    ],
+    "triggers": [
+      { "name": "trg_products_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

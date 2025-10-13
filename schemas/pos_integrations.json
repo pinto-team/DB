@@ -1,0 +1,85 @@
+{
+  "$id": "https://yourdomain/schemas/pos_integration.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "POS Integration",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "branch_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → branches.id"
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["square", "clover", "toast", "lightspeed", "micros", "oracle_simphony", "ncr_aloha", "revel", "shopify_pos", "poster", "sumup", "izettle", "other"],
+      "description": "POS provider"
+    },
+    "custom_provider": {
+      "type": ["string", "null"],
+      "maxLength": 100,
+      "description": "Custom POS provider name when provider=other"
+    },
+    "external_store_id": {
+      "type": ["string", "null"],
+      "maxLength": 128,
+      "description": "External store ID in the POS system"
+    },
+    "enabled": { "type": "boolean", "default": true },
+    "sync_status": {
+      "type": ["string", "null"],
+      "enum": ["success", "failed", "pending", "disabled"]
+    },
+    "last_sync_at": { "type": ["string", "null"], "format": "date-time" },
+    "config": {
+      "type": ["object", "null"],
+      "description": "Integration credentials/configuration",
+      "properties": {
+        "api_key": { "type": ["string", "null"] },
+        "secret": { "type": ["string", "null"] },
+        "endpoint": { "type": ["string", "null"], "format": "uri" }
+      },
+      "additionalProperties": false
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "provider", "enabled"],
+
+  "x-pg": {
+    "table": "pos_integrations",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["branch_id"],
+        "references": { "table": "branches", "columns": ["id"] },
+        "onDelete": "SET NULL"
+      }
+    ],
+    "unique": [
+      { "columns": ["store_id", "provider"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_pos_store", "columns": ["store_id"] },
+      { "name": "idx_pos_provider", "columns": ["provider"] },
+      { "name": "idx_pos_status", "columns": ["sync_status"] }
+    ],
+    "triggers": [
+      { "name": "trg_pos_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

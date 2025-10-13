@@ -1,0 +1,99 @@
+{
+  "$id": "https://yourdomain/schemas/promotion.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Promotion",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "branch_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → branches.id"
+    },
+
+    "name": { "type": "string", "minLength": 1, "description": "Promotion name" },
+    "type": {
+      "type": "string",
+      "enum": ["percent_off", "amount_off", "free_delivery", "bogo", "fixed_price_combo"],
+      "description": "Promotion type"
+    },
+    "value": {
+      "type": "number",
+      "minimum": 0,
+      "multipleOf": 0.01,
+      "description": "Discount value or percentage"
+    },
+
+    "conditions": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "min_subtotal": { "type": ["number", "null"], "minimum": 0 },
+        "applicable_sections": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "format": "uuid" },
+          "uniqueItems": true
+        },
+        "applicable_items": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "format": "uuid" },
+          "uniqueItems": true
+        },
+        "new_customers_only": { "type": "boolean", "default": false },
+        "schedule": {
+          "type": ["object", "null"],
+          "properties": {
+            "start_at": { "type": "string", "format": "date-time" },
+            "end_at": { "type": ["string", "null"], "format": "date-time" }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+
+    "stackable": { "type": "boolean", "default": false },
+    "code": { "type": ["string", "null"], "maxLength": 50 },
+    "max_uses": { "type": ["integer", "null"], "minimum": 1 },
+    "status": {
+      "type": "string",
+      "enum": ["scheduled", "active", "expired", "disabled"],
+      "default": "scheduled"
+    },
+
+    "created_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "name", "type", "value", "status"],
+
+  "x-pg": {
+    "table": "promotions",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "unique": [
+      { "columns": ["store_id", "code"], "where": "code IS NOT NULL AND deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_promotions_store", "columns": ["store_id"] },
+      { "name": "idx_promotions_branch", "columns": ["branch_id"] },
+      { "name": "idx_promotions_status", "columns": ["status"] },
+      { "name": "idx_promotions_type", "columns": ["type"] },
+      { "name": "idx_promotions_schedule", "using": "BTREE", "expression": "(conditions->'schedule')" }
+    ],
+    "triggers": [
+      { "name": "trg_promotions_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

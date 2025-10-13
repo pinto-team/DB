@@ -1,0 +1,87 @@
+{
+  "$id": "https://yourdomain/schemas/commission.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Commission",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["flat", "percent", "tiered"],
+      "default": "percent",
+      "description": "Type of commission calculation"
+    },
+    "rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "multipleOf": 0.01,
+      "description": "Percentage or fixed value depending on type"
+    },
+    "tiers": {
+      "type": ["array", "null"],
+      "description": "Applicable when type = tiered",
+      "items": {
+        "type": "object",
+        "properties": {
+          "min_amount": { "type": "number", "minimum": 0 },
+          "max_amount": { "type": ["number", "null"], "minimum": 0 },
+          "rate": { "type": "number", "minimum": 0, "maximum": 100 }
+        },
+        "required": ["min_amount", "rate"],
+        "additionalProperties": false
+      }
+    },
+    "applies_to": {
+      "type": "string",
+      "enum": ["orders", "delivery", "both"],
+      "default": "orders"
+    },
+    "effective_from": { "type": "string", "format": "date-time" },
+    "effective_to": { "type": ["string", "null"], "format": "date-time" },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "active", "expired", "disabled"],
+      "default": "draft"
+    },
+    "notes": { "type": ["string", "null"], "maxLength": 500 },
+    "created_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "approved_by_user_id": { "type": ["string", "null"], "format": "uuid" },
+    "approved_at": { "type": ["string", "null"], "format": "date-time" },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "type", "rate", "applies_to", "status"],
+
+  "x-pg": {
+    "table": "commissions",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_commission_store", "columns": ["store_id"] },
+      { "name": "idx_commission_status", "columns": ["status"] },
+      { "name": "idx_commission_effective", "columns": ["effective_from", "effective_to"] }
+    ],
+    "unique": [
+      { "columns": ["store_id", "status"], "where": "status = 'active'" }
+    ],
+    "triggers": [
+      { "name": "trg_commissions_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

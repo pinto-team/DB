@@ -1,0 +1,77 @@
+{
+  "$id": "https://yourdomain/schemas/item_availability.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Item Availability",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "item_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → items.id"
+    },
+    "branch_id": {
+      "type": ["string", "null"],
+      "format": "uuid",
+      "description": "FK → branches.id (optional)"
+    },
+    "day": {
+      "type": "string",
+      "enum": ["sat", "sun", "mon", "tue", "wed", "thu", "fri"],
+      "description": "Day of week"
+    },
+    "start": {
+      "type": "string",
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "Start time (HH:mm)"
+    },
+    "end": {
+      "type": "string",
+      "pattern": "^[0-2][0-9]:[0-5][0-9]$",
+      "description": "End time (HH:mm)"
+    },
+    "is_available": { "type": "boolean", "default": true },
+    "available_from": { "type": ["string", "null"], "format": "date" },
+    "available_to": { "type": ["string", "null"], "format": "date" },
+    "status": {
+      "type": "string",
+      "enum": ["active", "inactive"],
+      "default": "active"
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "item_id", "day", "start", "end", "is_available", "status"],
+
+  "x-pg": {
+    "table": "item_availability",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["item_id"], "references": { "table": "items", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" }
+    ],
+    "unique": [
+      { "columns": ["item_id", "day", "start", "end"], "where": "deleted_at IS NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_item_availability_store", "columns": ["store_id"] },
+      { "name": "idx_item_availability_item", "columns": ["item_id"] },
+      { "name": "idx_item_availability_branch", "columns": ["branch_id"] },
+      { "name": "idx_item_availability_day", "columns": ["day"] },
+      { "name": "idx_item_availability_status", "columns": ["status"] }
+    ],
+    "triggers": [
+      { "name": "trg_item_availability_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

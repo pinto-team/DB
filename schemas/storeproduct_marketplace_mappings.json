@@ -1,0 +1,81 @@
+{
+  "$id": "https://yourdomain/schemas/store_marketplace_mapping.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Store Marketplace Mapping",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id"
+    },
+    "store_product_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → store_products.id"
+    },
+    "marketplace": {
+      "type": "string",
+      "enum": ["snapp", "digikala", "tapsi", "wolt", "shopify", "woocommerce", "custom"],
+      "description": "Marketplace provider"
+    },
+    "external_product_id": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "External product identifier in marketplace"
+    },
+    "external_variant_id": {
+      "type": ["string", "null"],
+      "maxLength": 128,
+      "description": "External variant ID if applicable"
+    },
+    "sync_status": {
+      "type": "string",
+      "enum": ["pending", "synced", "failed", "disabled"],
+      "default": "pending"
+    },
+    "last_synced_at": { "type": ["string", "null"], "format": "date-time" },
+    "error_message": { "type": ["string", "null"], "maxLength": 500 },
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "Optional JSON for extra integration data",
+      "additionalProperties": true
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "store_product_id", "marketplace", "external_product_id"],
+
+  "x-pg": {
+    "table": "store_marketplace_mappings",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "columns": ["store_id"],
+        "references": { "table": "stores", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["store_product_id"],
+        "references": { "table": "store_products", "columns": ["id"] },
+        "onDelete": "CASCADE"
+      }
+    ],
+    "unique": [
+      { "columns": ["marketplace", "external_product_id"] },
+      { "columns": ["store_product_id", "marketplace"] }
+    ],
+    "indexes": [
+      { "name": "idx_smm_store", "columns": ["store_id"] },
+      { "name": "idx_smm_marketplace", "columns": ["marketplace"] },
+      { "name": "idx_smm_sync_status", "columns": ["sync_status"] }
+    ],
+    "triggers": [
+      { "name": "trg_smm_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$id": "https://yourdomain/schemas/orders/carts.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Cart",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id":            { "type": "string", "format": "uuid", "readOnly": true },
+    "customer_id":   { "type": "string", "format": "uuid", "description": "FK → customers.id" },
+    "store_id":      { "type": "string", "format": "uuid", "description": "FK → stores.id" },
+    "branch_id":     { "type": ["string","null"], "format": "uuid" },
+    "currency":      { "type": "string", "pattern": "^[A-Z]{3}$", "default": "IRR" },
+    "subtotal":      { "type": "number", "minimum": 0 },
+    "discount_total":{ "type": "number", "minimum": 0 },
+    "tax_total":     { "type": "number", "minimum": 0 },
+    "grand_total":   { "type": "number", "minimum": 0 },
+    "status": {
+      "type": "string",
+      "enum": ["active","checked_out","abandoned"],
+      "default": "active"
+    },
+    "expires_at":    { "type": ["string","null"], "format": "date-time" },
+    "created_at":    { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at":    { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at":    { "type": ["string","null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["customer_id","store_id","currency","status"],
+
+  "x-pg": {
+    "table": "carts",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns":["customer_id"],"references":{"table":"customers","columns":["id"]},"onDelete":"CASCADE" },
+      { "columns":["store_id"],"references":{"table":"stores","columns":["id"]},"onDelete":"CASCADE" }
+    ],
+    "indexes":[
+      { "name":"idx_carts_customer","columns":["customer_id"] },
+      { "name":"idx_carts_store","columns":["store_id"] },
+      { "name":"idx_carts_status","columns":["status"] }
+    ],
+    "triggers":[
+      { "name":"trg_carts_set_updated_at","timing":"BEFORE","event":"UPDATE","function":"set_updated_at()" }
+    ]
+  }
+}

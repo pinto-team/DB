@@ -1,0 +1,68 @@
+{
+  "$id": "https://yourdomain/schemas/product_categories.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductCategory",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "product_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the product (products.id)."
+    },
+    "category_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the category (categories.id)."
+    },
+    "is_primary": {
+      "type": "boolean",
+      "default": false,
+      "description": "Indicates if this category is the product's main category."
+    },
+    "sort_index": {
+      "type": "integer",
+      "default": 0,
+      "description": "Used for ordering categories for a product."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+    }
+  },
+
+  "required": ["product_id", "category_id"],
+
+  "x-pg": {
+    "table": "product_categories",
+    "primaryKey": ["product_id", "category_id"],
+    "foreignKeys": [
+      {
+        "columns": ["product_id"],
+        "references": { "table": "products", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "CASCADE"
+      },
+      {
+        "columns": ["category_id"],
+        "references": { "table": "categories", "columns": ["id"] },
+        "onUpdate": "CASCADE",
+        "onDelete": "CASCADE"
+      }
+    ],
+    "indexes": [
+      { "name": "idx_product_categories_category", "columns": ["category_id"] },
+      { "name": "idx_product_categories_primary", "columns": ["is_primary"] }
+    ],
+    "triggers": [
+      {
+        "name": "trg_product_categories_set_created_at",
+        "timing": "BEFORE",
+        "event": "INSERT",
+        "function": "set_created_at()"
+      }
+    ]
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "$id": "https://yourdomain/schemas/store_product.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Store Product",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "store_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → stores.id (merchant/branch)"
+    },
+    "variant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → product_variants.id"
+    },
+    "store_sku": { "type": ["string", "null"], "maxLength": 64 },
+    "is_listed": { "type": "boolean", "default": true },
+    "availability_status": {
+      "type": "string",
+      "enum": ["in_stock", "out_of_stock", "backorder", "preorder", "discontinued", "hidden"],
+      "default": "in_stock"
+    },
+    "channels": {
+      "type": "object",
+      "properties": {
+        "online": { "type": "boolean", "default": true },
+        "in_store": { "type": "boolean", "default": true }
+      },
+      "required": ["online", "in_store"],
+      "additionalProperties": false
+    },
+    "pricing": {
+      "type": ["object", "null"],
+      "properties": {
+        "currency": { "type": "string", "pattern": "^[A-Z]{3}$" },
+        "list_price": { "type": ["number", "null"], "minimum": 0, "multipleOf": 0.01 },
+        "sale_price": { "type": ["number", "null"], "minimum": 0, "multipleOf": 0.01 },
+        "tax_included": { "type": "boolean", "default": true },
+        "tax_class": { "type": ["string", "null"] },
+        "vat_percentage": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "price_effective_start": { "type": ["string", "null"], "format": "date-time" },
+        "price_effective_end": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "inventory": {
+      "type": ["object", "null"],
+      "properties": {
+        "tracking": { "type": "boolean", "default": true },
+        "stock_on_hand": { "type": ["integer", "null"], "minimum": 0 },
+        "stock_reserved": { "type": ["integer", "null"], "minimum": 0 },
+        "allow_backorder": { "type": "boolean", "default": false },
+        "backorder_limit": { "type": ["integer", "null"], "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "assortment_window": {
+      "type": ["object", "null"],
+      "properties": {
+        "start_at": { "type": ["string", "null"], "format": "date-time" },
+        "end_at": { "type": ["string", "null"], "format": "date-time" }
+      },
+      "additionalProperties": false
+    },
+    "overrides": {
+      "type": ["object", "null"],
+      "description": "Store-level overrides for variant fields",
+      "properties": {
+        "name": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "tags": {
+          "type": ["array", "null"],
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "images": {
+          "type": ["array", "null"],
+          "items": { "type": "string", "format": "uuid" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "notes": { "type": ["string", "null"] },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["store_id", "variant_id", "is_listed", "channels"],
+
+  "x-pg": {
+    "table": "store_products",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["variant_id"], "references": { "table": "product_variants", "columns": ["id"] }, "onDelete": "CASCADE" }
+    ],
+    "unique": [
+      { "columns": ["store_id", "variant_id"] },
+      { "columns": ["store_id", "store_sku"], "where": "store_sku IS NOT NULL" }
+    ],
+    "indexes": [
+      { "name": "idx_store_products_listed", "columns": ["store_id", "is_listed"] },
+      { "name": "idx_store_products_availability", "columns": ["availability_status"] },
+      { "name": "idx_store_products_channels_gin", "using": "GIN", "columns": ["channels"] },
+      { "name": "idx_store_products_overrides_gin", "using": "GIN", "columns": ["overrides"] },
+      { "name": "idx_store_products_assortment_gist", "using": "GIST", "columns": ["assortment_window"] }
+    ],
+    "triggers": [
+      { "name": "trg_store_products_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" },
+      { "name": "trg_store_products_guard", "timing": "BEFORE", "event": "INSERT OR UPDATE", "function": "store_products_guard()" }
+    ]
+  }
+}
