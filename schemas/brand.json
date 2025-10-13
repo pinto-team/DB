@@ -30,7 +30,7 @@
     "logo_id": {
       "type": ["string", "null"],
       "format": "uuid",
-      "description": "Reference to logo media file (media_files.id)."
+      "description": "Reference to logo media file (media.id)."
     },
 
     "slug": {
@@ -61,6 +61,9 @@
   "x-pg": {
     "table": "brands",
     "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["logo_id"], "references": { "table": "media", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" }
+    ],
     "unique": [{ "columns": ["slug"] }],
     "indexes": [
       { "name": "idx_active_brands", "columns": ["is_active"] }

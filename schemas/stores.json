@@ -89,7 +89,14 @@
       { "columns": ["country_id"], "references": { "table": "countries", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["address_id"], "references": { "table": "addresses", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["contact_id"], "references": { "table": "contacts", "columns": ["id"] }, "onDelete": "SET NULL" },
-      { "columns": ["wallet_id"], "references": { "table": "wallets", "columns": ["id"] }, "onDelete": "SET NULL" }
+      { "columns": ["wallet_id"], "references": { "table": "wallets", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["logo_media_id"], "references": { "table": "media", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["banner_media_id"], "references": { "table": "media", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["pos_integration_id"], "references": { "table": "pos_integrations", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["commission_id"], "references": { "table": "commissions", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["payout_account_id"], "references": { "table": "payout_accounts", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["store_settings_id"], "references": { "table": "store_settings", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["default_branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" }
     ],
     "triggers": [
       { "name": "trg_stores_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }

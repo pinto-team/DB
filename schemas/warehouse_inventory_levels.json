@@ -1,0 +1,74 @@
+{
+  "$id": "https://yourdomain/schemas/warehouse_inventory_level.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Warehouse Inventory Level",
+  "type": "object",
+  "additionalProperties": false,
+
+  "properties": {
+    "id": { "type": "string", "format": "uuid", "readOnly": true },
+    "warehouse_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → warehouses.id"
+    },
+    "variant_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "FK → product_variants.id"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["in_stock", "low_stock", "out_of_stock", "backordered", "discontinued"],
+      "default": "in_stock"
+    },
+    "on_hand": { "type": "integer", "minimum": 0 },
+    "reserved": { "type": "integer", "minimum": 0, "default": 0 },
+    "incoming": { "type": "integer", "minimum": 0, "default": 0 },
+    "safety_stock": { "type": ["integer", "null"], "minimum": 0 },
+    "reorder_point": { "type": ["integer", "null"], "minimum": 0 },
+    "replenishment_lead_time_days": { "type": ["number", "null"], "minimum": 0 },
+    "lot_tracking": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "lot_number": { "type": "string", "minLength": 1 },
+          "expires_at": { "type": ["string", "null"], "format": "date-time" },
+          "quantity": { "type": "integer", "minimum": 0 }
+        },
+        "required": ["lot_number", "quantity"]
+      }
+    },
+    "notes": { "type": ["string", "null"], "maxLength": 2000 },
+    "metadata": {
+      "type": ["object", "null"],
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+    },
+    "created_at": { "type": "string", "format": "date-time", "readOnly": true },
+    "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
+  },
+
+  "required": ["warehouse_id", "variant_id", "on_hand", "status"],
+
+  "x-pg": {
+    "table": "warehouse_inventory_levels",
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      { "columns": ["warehouse_id"], "references": { "table": "warehouses", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["variant_id"], "references": { "table": "product_variants", "columns": ["id"] }, "onDelete": "CASCADE" }
+    ],
+    "unique": [
+      { "columns": ["warehouse_id", "variant_id"] }
+    ],
+    "indexes": [
+      { "name": "idx_inventory_status", "columns": ["status"] },
+      { "name": "idx_inventory_low_stock", "columns": ["warehouse_id"], "where": "status = 'low_stock'" },
+      { "name": "idx_inventory_lot_tracking_gin", "using": "GIN", "columns": ["lot_tracking"] }
+    ],
+    "triggers": [
+      { "name": "trg_inventory_levels_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+    ]
+  }
+}

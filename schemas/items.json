@@ -105,7 +105,8 @@
       { "columns": ["menu_id"], "references": { "table": "menus", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["section_id"], "references": { "table": "menu_sections", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["product_id"], "references": { "table": "products", "columns": ["id"] }, "onDelete": "SET NULL" },
-      { "columns": ["variant_id"], "references": { "table": "product_variants", "columns": ["id"] }, "onDelete": "SET NULL" }
+      { "columns": ["variant_id"], "references": { "table": "product_variants", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["image_media_id"], "references": { "table": "media", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" }
     ],
     "indexes": [
       { "name": "idx_items_store", "columns": ["store_id"] },
