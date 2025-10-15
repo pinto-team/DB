@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "branch_id": {
       "type": ["string", "null"],
@@ -27,10 +27,10 @@
       "maxLength": 100,
       "description": "Custom POS provider name when provider=other"
     },
-    "external_store_id": {
+    "external_merchant_id": {
       "type": ["string", "null"],
       "maxLength": 128,
-      "description": "External store ID in the POS system"
+      "description": "External merchant ID in the POS system"
     },
     "enabled": { "type": "boolean", "default": true },
     "sync_status": {
@@ -53,15 +53,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "provider", "enabled"],
+  "required": ["merchant_id", "provider", "enabled"],
 
   "x-pg": {
     "table": "pos_integrations",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -71,10 +71,10 @@
       }
     ],
     "unique": [
-      { "columns": ["store_id", "provider"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "provider"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_pos_store", "columns": ["store_id"] },
+      { "name": "idx_pos_merchant", "columns": ["merchant_id"] },
       { "name": "idx_pos_provider", "columns": ["provider"] },
       { "name": "idx_pos_status", "columns": ["sync_status"] }
     ],

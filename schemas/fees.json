@@ -8,10 +8,10 @@
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
 
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
 
     "name": {
@@ -74,7 +74,7 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "name", "type", "amount", "applies_to", "status"],
+  "required": ["merchant_id", "name", "type", "amount", "applies_to", "status"],
 
   "allOf": [
     {
@@ -92,19 +92,19 @@
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       }
     ],
     "indexes": [
-      { "name": "idx_fees_store", "columns": ["store_id"] },
+      { "name": "idx_fees_merchant", "columns": ["merchant_id"] },
       { "name": "idx_fees_status", "columns": ["status"] },
       { "name": "idx_fees_effective", "columns": ["effective_from", "effective_to"] },
       { "name": "idx_fees_applies_to", "columns": ["applies_to"] }
     ],
     "unique": [
-      { "columns": ["store_id", "name", "status"], "where": "status = 'active'" }
+      { "columns": ["merchant_id", "name", "status"], "where": "status = 'active'" }
     ],
     "triggers": [
       { "name": "trg_fees_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }

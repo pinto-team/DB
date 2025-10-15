@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "menu_id": {
       "type": "string",
@@ -30,15 +30,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "menu_id", "name", "status"],
+  "required": ["merchant_id", "menu_id", "name", "status"],
 
   "x-pg": {
     "table": "menu_sections",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -51,7 +51,7 @@
       { "columns": ["menu_id", "name"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_menu_sections_store", "columns": ["store_id"] },
+      { "name": "idx_menu_sections_merchant", "columns": ["merchant_id"] },
       { "name": "idx_menu_sections_menu", "columns": ["menu_id"] },
       { "name": "idx_menu_sections_status", "columns": ["status"] },
       { "name": "idx_menu_sections_display_order", "columns": ["display_order"] }

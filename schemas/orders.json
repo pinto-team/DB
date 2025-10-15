@@ -7,7 +7,7 @@
 
   "properties": {
     "id":           { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id":     { "type": "string", "format": "uuid" },
+    "merchant_id":     { "type": "string", "format": "uuid" },
     "customer_id":  { "type": "string", "format": "uuid" },
     "branch_id":    { "type": ["string","null"], "format": "uuid" },
     "cart_id":      { "type": ["string","null"], "format": "uuid" },
@@ -40,17 +40,17 @@
     "deleted_at": { "type": ["string","null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id","customer_id","currency","status","payment_status"],
+  "required": ["merchant_id","customer_id","currency","status","payment_status"],
 
   "x-pg": {
     "table": "orders",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns":["store_id"],"references":{"table":"stores","columns":["id"]},"onDelete":"CASCADE" },
+      { "columns":["merchant_id"],"references":{"table":"merchants","columns":["id"]},"onDelete":"CASCADE" },
       { "columns":["customer_id"],"references":{"table":"customers","columns":["id"]},"onDelete":"CASCADE" }
     ],
     "indexes":[
-      { "name":"idx_orders_store","columns":["store_id"] },
+      { "name":"idx_orders_merchant","columns":["merchant_id"] },
       { "name":"idx_orders_customer","columns":["customer_id"] },
       { "name":"idx_orders_status","columns":["status"] }
     ],

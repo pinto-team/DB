@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "branch_id": {
       "type": ["string", "null"],
@@ -36,15 +36,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "service", "name", "status"],
+  "required": ["merchant_id", "service", "name", "status"],
 
   "x-pg": {
     "table": "schedules",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -54,13 +54,13 @@
       }
     ],
     "indexes": [
-      { "name": "idx_schedules_store", "columns": ["store_id"] },
+      { "name": "idx_schedules_merchant", "columns": ["merchant_id"] },
       { "name": "idx_schedules_branch", "columns": ["branch_id"] },
       { "name": "idx_schedules_status", "columns": ["status"] },
       { "name": "idx_schedules_effective", "columns": ["effective_from", "effective_to"] }
     ],
     "unique": [
-      { "columns": ["store_id", "service", "name"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "service", "name"], "where": "deleted_at IS NULL" }
     ],
     "triggers": [
       { "name": "trg_schedules_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }

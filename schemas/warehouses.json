@@ -12,7 +12,7 @@
     "description": { "type": ["string", "null"], "maxLength": 1000 },
     "owner_type": {
       "type": "string",
-      "enum": ["platform", "brand", "store", "third_party"],
+      "enum": ["platform", "brand", "merchant", "third_party"],
       "default": "brand",
       "description": "Controls which entity operates the warehouse"
     },
@@ -21,10 +21,10 @@
       "format": "uuid",
       "description": "Optional FK → brand.id when owner_type = brand"
     },
-    "store_id": {
+    "merchant_id": {
       "type": ["string", "null"],
       "format": "uuid",
-      "description": "Optional FK → stores.id when owner_type = store"
+      "description": "Optional FK → merchants.id when owner_type = merchant"
     },
     "address_id": {
       "type": "string",
@@ -111,8 +111,8 @@
       "then": { "required": ["brand_id"] }
     },
     {
-      "if": { "properties": { "owner_type": { "const": "store" } } },
-      "then": { "required": ["store_id"] }
+      "if": { "properties": { "owner_type": { "const": "merchant" } } },
+      "then": { "required": ["merchant_id"] }
     }
   ],
 
@@ -127,7 +127,7 @@
     ],
     "foreignKeys": [
       { "columns": ["brand_id"], "references": { "table": "brands", "columns": ["id"] }, "onDelete": "SET NULL" },
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "SET NULL" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["address_id"], "references": { "table": "addresses", "columns": ["id"] }, "onDelete": "RESTRICT" },
       { "columns": ["contact_id"], "references": { "table": "contacts", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["operational_schedule_id"], "references": { "table": "schedules", "columns": ["id"] }, "onDelete": "SET NULL" }

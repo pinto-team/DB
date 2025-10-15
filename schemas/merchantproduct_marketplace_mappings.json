@@ -1,21 +1,21 @@
 {
-  "$id": "https://yourdomain/schemas/store_marketplace_mapping.json",
+  "$id": "https://yourdomain/schemas/merchant_marketplace_mapping.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Store Marketplace Mapping",
+  "title": "Merchant Marketplace Mapping",
   "type": "object",
   "additionalProperties": false,
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
-    "store_product_id": {
+    "merchant_product_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → store_products.id"
+      "description": "FK → merchant_products.id"
     },
     "marketplace": {
       "type": "string",
@@ -48,29 +48,29 @@
     "updated_at": { "type": "string", "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "store_product_id", "marketplace", "external_product_id"],
+  "required": ["merchant_id", "merchant_product_id", "marketplace", "external_product_id"],
 
   "x-pg": {
-    "table": "store_marketplace_mappings",
+    "table": "merchant_marketplace_mappings",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
-        "columns": ["store_product_id"],
-        "references": { "table": "store_products", "columns": ["id"] },
+        "columns": ["merchant_product_id"],
+        "references": { "table": "merchant_products", "columns": ["id"] },
         "onDelete": "CASCADE"
       }
     ],
     "unique": [
       { "columns": ["marketplace", "external_product_id"] },
-      { "columns": ["store_product_id", "marketplace"] }
+      { "columns": ["merchant_product_id", "marketplace"] }
     ],
     "indexes": [
-      { "name": "idx_smm_store", "columns": ["store_id"] },
+      { "name": "idx_smm_merchant", "columns": ["merchant_id"] },
       { "name": "idx_smm_marketplace", "columns": ["marketplace"] },
       { "name": "idx_smm_sync_status", "columns": ["sync_status"] }
     ],

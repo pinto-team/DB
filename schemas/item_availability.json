@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "item_id": {
       "type": "string",
@@ -50,13 +50,13 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "item_id", "day", "start", "end", "is_available", "status"],
+  "required": ["merchant_id", "item_id", "day", "start", "end", "is_available", "status"],
 
   "x-pg": {
     "table": "item_availability",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["item_id"], "references": { "table": "items", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" }
     ],
@@ -64,7 +64,7 @@
       { "columns": ["item_id", "day", "start", "end"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_item_availability_store", "columns": ["store_id"] },
+      { "name": "idx_item_availability_merchant", "columns": ["merchant_id"] },
       { "name": "idx_item_availability_item", "columns": ["item_id"] },
       { "name": "idx_item_availability_branch", "columns": ["branch_id"] },
       { "name": "idx_item_availability_day", "columns": ["day"] },

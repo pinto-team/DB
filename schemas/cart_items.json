@@ -8,7 +8,7 @@
   "properties": {
     "id":           { "type": "string", "format": "uuid", "readOnly": true },
     "cart_id":      { "type": "string", "format": "uuid", "description": "FK → carts.id" },
-    "product_id":   { "type": "string", "format": "uuid", "description": "FK → store_products.id" },
+    "product_id":   { "type": "string", "format": "uuid", "description": "FK → merchant_products.id" },
     "variant_id":   { "type": ["string","null"], "format": "uuid" },
     "quantity":     { "type": "integer", "minimum": 1 },
     "unit_price":   { "type": "number", "minimum": 0 },

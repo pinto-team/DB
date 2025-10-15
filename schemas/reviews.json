@@ -8,7 +8,7 @@
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
 
-    "store_id": { "type": "string", "format": "uuid", "description": "FK → stores.id" },
+    "merchant_id": { "type": "string", "format": "uuid", "description": "FK → merchants.id" },
     "branch_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → branches.id" },
     "order_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → orders.id" },
     "user_id": { "type": ["string", "null"], "format": "uuid", "description": "FK → customers.id" },
@@ -53,19 +53,19 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "rating", "status"],
+  "required": ["merchant_id", "rating", "status"],
 
   "x-pg": {
     "table": "reviews",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["order_id"], "references": { "table": "orders", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["user_id"], "references": { "table": "customers", "columns": ["id"] }, "onDelete": "SET NULL" }
     ],
     "indexes": [
-      { "name": "idx_reviews_store", "columns": ["store_id"] },
+      { "name": "idx_reviews_merchant", "columns": ["merchant_id"] },
       { "name": "idx_reviews_status", "columns": ["status"] },
       { "name": "idx_reviews_rating", "columns": ["rating"] }
     ],

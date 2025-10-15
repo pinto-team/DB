@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "type": {
       "type": "string",
@@ -50,20 +50,20 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "type", "status"],
+  "required": ["merchant_id", "type", "status"],
 
   "x-pg": {
     "table": "contacts",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       }
     ],
     "indexes": [
-      { "name": "idx_contacts_store", "columns": ["store_id"] },
+      { "name": "idx_contacts_merchant", "columns": ["merchant_id"] },
       { "name": "idx_contacts_type", "columns": ["type"] },
       { "name": "idx_contacts_status", "columns": ["status"] },
       { "name": "idx_contacts_email", "expression": "lower(email)" }

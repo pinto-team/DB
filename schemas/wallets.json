@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "currency": {
       "type": "string",
@@ -50,23 +50,23 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "currency", "status"],
+  "required": ["merchant_id", "currency", "status"],
 
   "x-pg": {
     "table": "wallets",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       }
     ],
     "unique": [
-      { "columns": ["store_id", "currency"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "currency"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_wallets_store", "columns": ["store_id"] },
+      { "name": "idx_wallets_merchant", "columns": ["merchant_id"] },
       { "name": "idx_wallets_status", "columns": ["status"] },
       { "name": "idx_wallets_currency", "columns": ["currency"] }
     ],

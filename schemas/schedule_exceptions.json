@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "schedule_id": {
       "type": "string",
@@ -35,7 +35,7 @@
     "is_closed": {
       "type": "boolean",
       "default": true,
-      "description": "Marks the store as closed during this exception"
+      "description": "Marks the merchant as closed during this exception"
     },
     "reason": {
       "type": ["string", "null"],
@@ -47,15 +47,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "schedule_id", "date", "is_closed"],
+  "required": ["merchant_id", "schedule_id", "date", "is_closed"],
 
   "x-pg": {
     "table": "schedule_exceptions",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -68,7 +68,7 @@
       { "columns": ["schedule_id", "date"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_schedule_exceptions_store", "columns": ["store_id"] },
+      { "name": "idx_schedule_exceptions_merchant", "columns": ["merchant_id"] },
       { "name": "idx_schedule_exceptions_schedule", "columns": ["schedule_id"] },
       { "name": "idx_schedule_exceptions_date", "columns": ["date"] },
       { "name": "idx_schedule_exceptions_is_closed", "columns": ["is_closed"] }

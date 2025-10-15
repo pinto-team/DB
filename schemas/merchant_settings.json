@@ -1,21 +1,21 @@
 {
-  "$id": "https://yourdomain/schemas/store_settings.json",
+  "$id": "https://yourdomain/schemas/merchant_settings.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Store Settings",
+  "title": "Merchant Settings",
   "type": "object",
   "additionalProperties": false,
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
 
     "supports": {
       "type": "object",
-      "description": "Store service capabilities",
+      "description": "Merchant service capabilities",
       "properties": {
         "delivery": { "type": "boolean", "default": true },
         "pickup": { "type": "boolean", "default": true },
@@ -69,24 +69,24 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "supports"],
+  "required": ["merchant_id", "supports"],
 
   "x-pg": {
-    "table": "store_settings",
+    "table": "merchant_settings",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       }
     ],
-    "unique": [{ "columns": ["store_id"] }],
+    "unique": [{ "columns": ["merchant_id"] }],
     "indexes": [
-      { "name": "idx_store_settings_store", "columns": ["store_id"] }
+      { "name": "idx_merchant_settings_merchant", "columns": ["merchant_id"] }
     ],
     "triggers": [
-      { "name": "trg_store_settings_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+      { "name": "trg_merchant_settings_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
     ]
   }
 }
