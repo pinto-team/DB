@@ -17,6 +17,11 @@
       "description": "Localized name (e.g., {'en': 'Red', 'fa': 'قرمز'})",
       "additionalProperties": { "type": "string" }
     },
+    "value": {
+      "type": ["string", "null"],
+      "maxLength": 255,
+      "description": "Machine-readable value for the option (e.g., HEX code for a color)"
+    },
     "slug": {
       "type": "string",
       "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
@@ -41,7 +46,8 @@
       }
     ],
     "unique": [
-      { "columns": ["option_id", "lower(slug)"] }
+      { "columns": ["option_id", "lower(slug)"] },
+      { "columns": ["option_id", "value"], "where": "value IS NOT NULL" }
     ],
     "indexes": [
       { "name": "idx_option_values_option", "columns": ["option_id"] },
