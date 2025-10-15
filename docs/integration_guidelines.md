@@ -32,7 +32,7 @@
 - **menus**: ساختار منو با مشخصات `store_id`, `name`, `menu_type`, `is_active` و بازه‌های نمایش (`available_from`, `available_to`).【F:schemas/menus.json†L1-L153】
 - **menu_sections**: دسته‌بندی‌های درون منو؛ شامل `menu_id`, `title`, `display_order` و وضعیت انتشار.【F:schemas/menu_sections.json†L1-L158】
 - **items**: آیتم پایه‌ای غذا با فیلدهای `store_id`, `menu_section_id`, `sku`, `price`, `tax_category_id`, `is_available`. این جدول به رسانه (`primary_media_id`) و گروه‌های اصلاح‌گر متصل است.【F:schemas/items.json†L1-L286】
-- **modifier_groups / options / option_values**: تعریف گزینه‌های انتخابی و قیمت افزوده برای آیتم‌ها. هنگام تغییر باید سازگاری بین `modifier_groups.items` و `options.modifier_group_id` حفظ شود.【F:schemas/modifier_groups.json†L1-L209】【F:schemas/options.json†L1-L205】
+- **modifier_groups / options / option_values**: تعریف گزینه‌های انتخابی و قیمت افزوده برای آیتم‌ها. هنگام تغییر باید سازگاری بین `modifier_groups.items` و `options.modifier_group_id` حفظ شود. برای نگاشت‌های کلید-مقدار (مانند رنگ → کد HEX) از فیلد `option_values.value` استفاده کنید تا مقدار ماشین‌خوان با نمایش محلی (`option_values.name`) تفکیک شود.【F:schemas/modifier_groups.json†L1-L209】【F:schemas/options.json†L1-L205】【F:schemas/option_values.json†L1-L210】
 
 ### مشتریان و حساب‌ها
 - **customers**: اطلاعات هویتی شامل `first_name`, `last_name`, `email`, `phone`, `default_address_id`, `loyalty_points` و وضعیت حساب.【F:schemas/customers.json†L1-L223】
