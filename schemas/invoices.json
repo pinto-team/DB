@@ -7,7 +7,7 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": { "type": "string", "format": "uuid" },
+    "merchant_id": { "type": "string", "format": "uuid" },
     "settlement_id": { "type": ["string", "null"], "format": "uuid" },
     "invoice_number": { "type": "string", "maxLength": 50 },
     "issued_at": { "type": "string", "format": "date-time" },
@@ -27,17 +27,17 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "invoice_number", "issued_at", "amount", "currency", "status"],
+  "required": ["merchant_id", "invoice_number", "issued_at", "amount", "currency", "status"],
 
   "x-pg": {
     "table": "invoices",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["settlement_id"], "references": { "table": "settlements", "columns": ["id"] }, "onDelete": "SET NULL" }
     ],
     "indexes": [
-      { "name": "idx_invoices_store", "columns": ["store_id"] },
+      { "name": "idx_invoices_merchant", "columns": ["merchant_id"] },
       { "name": "idx_invoices_status", "columns": ["status"] },
       { "name": "idx_invoices_number", "columns": ["invoice_number"] }
     ],

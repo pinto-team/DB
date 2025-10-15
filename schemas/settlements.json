@@ -7,7 +7,7 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": { "type": "string", "format": "uuid", "description": "FK → stores.id" },
+    "merchant_id": { "type": "string", "format": "uuid", "description": "FK → merchants.id" },
     "period_start": { "type": "string", "format": "date" },
     "period_end": { "type": "string", "format": "date" },
     "currency": { "type": "string", "pattern": "^[A-Z]{3}$", "default": "IRR" },
@@ -30,17 +30,17 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "period_start", "period_end", "currency", "status"],
+  "required": ["merchant_id", "period_start", "period_end", "currency", "status"],
 
   "x-pg": {
     "table": "settlements",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["payout_account_id"], "references": { "table": "payout_accounts", "columns": ["id"] }, "onDelete": "SET NULL" }
     ],
     "indexes": [
-      { "name": "idx_settlements_store", "columns": ["store_id"] },
+      { "name": "idx_settlements_merchant", "columns": ["merchant_id"] },
       { "name": "idx_settlements_status", "columns": ["status"] }
     ],
     "triggers": [

@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "type": {
       "type": "string",
@@ -42,15 +42,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "type", "media_id", "number", "issued_at"],
+  "required": ["merchant_id", "type", "media_id", "number", "issued_at"],
 
   "x-pg": {
     "table": "compliance_documents",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -60,7 +60,7 @@
       }
     ],
     "indexes": [
-      { "name": "idx_compliance_store", "columns": ["store_id"] },
+      { "name": "idx_compliance_merchant", "columns": ["merchant_id"] },
       { "name": "idx_compliance_type", "columns": ["type"] },
       { "name": "idx_compliance_status", "columns": ["status"] },
       { "name": "idx_compliance_expires", "columns": ["expires_at"] }

@@ -8,8 +8,8 @@
 
 ## استانداردهای نام‌گذاری و نوع داده
 - نام جدول‌ها و فیلدها با حروف کوچک و خط زیرین (`snake_case`) نوشته می‌شوند.
-- تمام کلیدهای اصلی (`id`) از نوع UUID و فقط خواندنی هستند. نمونه: `orders.id` و `stores.id`.‌
-- فیلدهای ارجاعی به جدول‌های دیگر نیز UUID هستند و با پسوند `_id` نام‌گذاری می‌شوند (مانند `orders.store_id` یا `branches.store_id`).
+- تمام کلیدهای اصلی (`id`) از نوع UUID و فقط خواندنی هستند. نمونه: `orders.id` و `merchants.id`.‌
+- فیلدهای ارجاعی به جدول‌های دیگر نیز UUID هستند و با پسوند `_id` نام‌گذاری می‌شوند (مانند `orders.merchant_id` یا `branches.merchant_id`).
 - فیلدهای تاریخ به صورت رشته با فرمت RFC 3339 (`date-time`) ذخیره می‌شوند: `created_at`, `updated_at`, `deleted_at`.
 - مقادیر پولی و عددی از نوع `number` با حداقل صفر هستند (مثل `orders.subtotal`, `orders.grand_total`).
 - برای فیلدهای شمارشی حتماً لیست `enum` را به‌روزرسانی کنید تا از مقادیر نامعتبر جلوگیری شود (مثال: `orders.status`, `orders.payment_status`).
@@ -17,21 +17,21 @@
 ## فیلدهای مشترک
 | فیلد | توضیح | محل استفاده |
 | --- | --- | --- |
-| `id` | شناسه یکتا (UUID) فقط خواندنی | تمام جدول‌های اصلی مثل `stores`, `orders`, `customers` | 
-| `created_at` / `updated_at` | مهر زمانی ایجاد/آخرین بروزرسانی | اکثر شِماها از جمله `stores`, `orders`, `menus` |
-| `deleted_at` | حذف نرم برای بازیابی احتمالی | جدول‌هایی که نیاز به نگهداری تاریخچه دارند (`orders`, `stores`, `items`) |
+| `id` | شناسه یکتا (UUID) فقط خواندنی | تمام جدول‌های اصلی مثل `merchants`, `orders`, `customers` | 
+| `created_at` / `updated_at` | مهر زمانی ایجاد/آخرین بروزرسانی | اکثر شِماها از جمله `merchants`, `orders`, `menus` |
+| `deleted_at` | حذف نرم برای بازیابی احتمالی | جدول‌هایی که نیاز به نگهداری تاریخچه دارند (`orders`, `merchants`, `items`) |
 
 ## ساختار و روابط جدول‌های کلیدی
 
 ### فروشندگان و ساختار شعبه‌ها
-- **stores**: نگهدارنده موجودیت فروشنده با فیلدهای کلیدی `name`, `legal_name`, `country_id`, `commission_id`, `wallet_id`, `payout_account_id` و ارتباط با تنظیمات فروشگاه (`store_settings_id`) و رسانه‌ها (`logo_media_id`, `banner_media_id`).【F:schemas/stores.json†L1-L215】
-- **branches**: هر رکورد مربوط به شعب یک فروشنده است. شامل `store_id`, `address_id`, `timezone`, `status` و پیکربندی سرویس‌دهی (مانند `fulfillment_types`).【F:schemas/branches.json†L1-L242】
-- **store_settings**: تعریف SLA، ساعات کار، قوانین هزینه ارسال و تنظیمات عملیات فروشگاه. هر `stores.store_settings_id` به این جدول اشاره دارد.【F:schemas/store_settings.json†L1-L210】
+- **merchants**: نگهدارنده موجودیت فروشنده با فیلدهای کلیدی `name`, `legal_name`, `country_id`, `commission_id`, `wallet_id`, `payout_account_id` و ارتباط با تنظیمات فروشگاه (`merchant_settings_id`) و رسانه‌ها (`logo_media_id`, `banner_media_id`).【F:schemas/merchants.json†L1-L215】
+- **branches**: هر رکورد مربوط به شعب یک فروشنده است. شامل `merchant_id`, `address_id`, `timezone`, `status` و پیکربندی سرویس‌دهی (مانند `fulfillment_types`).【F:schemas/branches.json†L1-L242】
+- **merchant_settings**: تعریف SLA، ساعات کار، قوانین هزینه ارسال و تنظیمات عملیات فروشگاه. هر `merchants.merchant_settings_id` به این جدول اشاره دارد.【F:schemas/merchant_settings.json†L1-L210】
 
 ### مدیریت منو و آیتم‌ها
-- **menus**: ساختار منو با مشخصات `store_id`, `name`, `menu_type`, `is_active` و بازه‌های نمایش (`available_from`, `available_to`).【F:schemas/menus.json†L1-L153】
+- **menus**: ساختار منو با مشخصات `merchant_id`, `name`, `menu_type`, `is_active` و بازه‌های نمایش (`available_from`, `available_to`).【F:schemas/menus.json†L1-L153】
 - **menu_sections**: دسته‌بندی‌های درون منو؛ شامل `menu_id`, `title`, `display_order` و وضعیت انتشار.【F:schemas/menu_sections.json†L1-L158】
-- **items**: آیتم پایه‌ای غذا با فیلدهای `store_id`, `menu_section_id`, `sku`, `price`, `tax_category_id`, `is_available`. این جدول به رسانه (`primary_media_id`) و گروه‌های اصلاح‌گر متصل است.【F:schemas/items.json†L1-L286】
+- **items**: آیتم پایه‌ای غذا با فیلدهای `merchant_id`, `menu_section_id`, `sku`, `price`, `tax_category_id`, `is_available`. این جدول به رسانه (`primary_media_id`) و گروه‌های اصلاح‌گر متصل است.【F:schemas/items.json†L1-L286】
 - **modifier_groups / options / option_values**: تعریف گزینه‌های انتخابی و قیمت افزوده برای آیتم‌ها. هنگام تغییر باید سازگاری بین `modifier_groups.items` و `options.modifier_group_id` حفظ شود. برای نگاشت‌های کلید-مقدار (مانند رنگ → کد HEX) از فیلد `option_values.value` استفاده کنید تا مقدار ماشین‌خوان با نمایش محلی (`option_values.name`) تفکیک شود.【F:schemas/modifier_groups.json†L1-L209】【F:schemas/options.json†L1-L205】【F:schemas/option_values.json†L1-L210】
 
 ### مشتریان و حساب‌ها

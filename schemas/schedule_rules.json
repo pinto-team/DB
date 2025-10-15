@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "schedule_id": {
       "type": "string",
@@ -39,15 +39,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "schedule_id", "day", "start", "end"],
+  "required": ["merchant_id", "schedule_id", "day", "start", "end"],
 
   "x-pg": {
     "table": "schedule_rules",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -60,7 +60,7 @@
       { "columns": ["schedule_id", "day", "start", "end"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_schedule_rules_store", "columns": ["store_id"] },
+      { "name": "idx_schedule_rules_merchant", "columns": ["merchant_id"] },
       { "name": "idx_schedule_rules_schedule", "columns": ["schedule_id"] },
       { "name": "idx_schedule_rules_day", "columns": ["day"] },
       { "name": "idx_schedule_rules_priority", "columns": ["priority"] }

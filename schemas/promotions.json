@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "branch_id": {
       "type": ["string", "null"],
@@ -73,20 +73,20 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "name", "type", "value", "status"],
+  "required": ["merchant_id", "name", "type", "value", "status"],
 
   "x-pg": {
     "table": "promotions",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL" }
     ],
     "unique": [
-      { "columns": ["store_id", "code"], "where": "code IS NOT NULL AND deleted_at IS NULL" }
+      { "columns": ["merchant_id", "code"], "where": "code IS NOT NULL AND deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_promotions_store", "columns": ["store_id"] },
+      { "name": "idx_promotions_merchant", "columns": ["merchant_id"] },
       { "name": "idx_promotions_branch", "columns": ["branch_id"] },
       { "name": "idx_promotions_status", "columns": ["status"] },
       { "name": "idx_promotions_type", "columns": ["type"] },

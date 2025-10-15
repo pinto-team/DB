@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "name": { "type": "string", "minLength": 1, "description": "Group name" },
     "selection_type": {
@@ -50,21 +50,21 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "name", "selection_type", "status"],
+  "required": ["merchant_id", "name", "selection_type", "status"],
 
   "x-pg": {
     "table": "modifier_groups",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" }
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" }
     ],
     "indexes": [
-      { "name": "idx_modifier_groups_store", "columns": ["store_id"] },
+      { "name": "idx_modifier_groups_merchant", "columns": ["merchant_id"] },
       { "name": "idx_modifier_groups_status", "columns": ["status"] },
       { "name": "idx_modifier_groups_display_order", "columns": ["display_order"] }
     ],
     "unique": [
-      { "columns": ["store_id", "name"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "name"], "where": "deleted_at IS NULL" }
     ],
     "triggers": [
       { "name": "trg_modifier_groups_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }

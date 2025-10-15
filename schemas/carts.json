@@ -8,7 +8,7 @@
   "properties": {
     "id":            { "type": "string", "format": "uuid", "readOnly": true },
     "customer_id":   { "type": "string", "format": "uuid", "description": "FK → customers.id" },
-    "store_id":      { "type": "string", "format": "uuid", "description": "FK → stores.id" },
+    "merchant_id":      { "type": "string", "format": "uuid", "description": "FK → merchants.id" },
     "branch_id":     { "type": ["string","null"], "format": "uuid" },
     "currency":      { "type": "string", "pattern": "^[A-Z]{3}$", "default": "IRR" },
     "subtotal":      { "type": "number", "minimum": 0 },
@@ -26,18 +26,18 @@
     "deleted_at":    { "type": ["string","null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["customer_id","store_id","currency","status"],
+  "required": ["customer_id","merchant_id","currency","status"],
 
   "x-pg": {
     "table": "carts",
     "primaryKey": ["id"],
     "foreignKeys": [
       { "columns":["customer_id"],"references":{"table":"customers","columns":["id"]},"onDelete":"CASCADE" },
-      { "columns":["store_id"],"references":{"table":"stores","columns":["id"]},"onDelete":"CASCADE" }
+      { "columns":["merchant_id"],"references":{"table":"merchants","columns":["id"]},"onDelete":"CASCADE" }
     ],
     "indexes":[
       { "name":"idx_carts_customer","columns":["customer_id"] },
-      { "name":"idx_carts_store","columns":["store_id"] },
+      { "name":"idx_carts_merchant","columns":["merchant_id"] },
       { "name":"idx_carts_status","columns":["status"] }
     ],
     "triggers":[

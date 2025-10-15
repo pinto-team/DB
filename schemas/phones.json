@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "contact_id": {
       "type": ["string", "null"],
@@ -47,15 +47,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "label", "number", "type", "status"],
+  "required": ["merchant_id", "label", "number", "type", "status"],
 
   "x-pg": {
     "table": "phones",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -65,10 +65,10 @@
       }
     ],
     "unique": [
-      { "columns": ["store_id", "number", "type"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "number", "type"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_phones_store", "columns": ["store_id"] },
+      { "name": "idx_phones_merchant", "columns": ["merchant_id"] },
       { "name": "idx_phones_contact", "columns": ["contact_id"] },
       { "name": "idx_phones_type", "columns": ["type"] },
       { "name": "idx_phones_status", "columns": ["status"] },

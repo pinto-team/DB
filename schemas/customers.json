@@ -23,7 +23,7 @@
     "last_login_at": { "type": ["string", "null"], "format": "date-time" },
     "metadata": {
       "type": ["object", "null"],
-      "description": "Flexible key/value store for integration specific attributes",
+      "description": "Flexible key/value merchant for integration specific attributes",
       "additionalProperties": true
     },
     "created_at": { "type": "string", "format": "date-time", "readOnly": true },

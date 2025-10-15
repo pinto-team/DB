@@ -1,7 +1,7 @@
 {
-  "$id": "https://yourdomain/schemas/store.json",
+  "$id": "https://yourdomain/schemas/merchant.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Store",
+  "title": "Merchant",
   "type": "object",
   "additionalProperties": false,
 
@@ -39,7 +39,7 @@
     "pos_integration_id": { "type": ["string", "null"], "format": "uuid" },
     "commission_id": { "type": ["string", "null"], "format": "uuid" },
     "payout_account_id": { "type": ["string", "null"], "format": "uuid" },
-    "store_settings_id": { "type": ["string", "null"], "format": "uuid" },
+    "merchant_settings_id": { "type": ["string", "null"], "format": "uuid" },
     "default_branch_id": { "type": ["string", "null"], "format": "uuid" },
     "wallet_id": { "type": ["string", "null"], "format": "uuid" },
     "timezone": { "type": "string", "default": "Asia/Tehran" },
@@ -77,13 +77,13 @@
   "required": ["name", "status", "default_currency"],
 
   "x-pg": {
-    "table": "stores",
+    "table": "merchants",
     "primaryKey": ["id"],
     "unique": [{ "columns": ["slug"], "where": "slug IS NOT NULL" }],
     "indexes": [
-      { "name": "idx_stores_status", "columns": ["status"] },
-      { "name": "idx_stores_country", "columns": ["country_id"] },
-      { "name": "idx_stores_owner", "columns": ["owner_user_id"] }
+      { "name": "idx_merchants_status", "columns": ["status"] },
+      { "name": "idx_merchants_country", "columns": ["country_id"] },
+      { "name": "idx_merchants_owner", "columns": ["owner_user_id"] }
     ],
     "foreignKeys": [
       { "columns": ["country_id"], "references": { "table": "countries", "columns": ["id"] }, "onDelete": "SET NULL" },
@@ -95,11 +95,11 @@
       { "columns": ["pos_integration_id"], "references": { "table": "pos_integrations", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
       { "columns": ["commission_id"], "references": { "table": "commissions", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
       { "columns": ["payout_account_id"], "references": { "table": "payout_accounts", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
-      { "columns": ["store_settings_id"], "references": { "table": "store_settings", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
+      { "columns": ["merchant_settings_id"], "references": { "table": "merchant_settings", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" },
       { "columns": ["default_branch_id"], "references": { "table": "branches", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" }
     ],
     "triggers": [
-      { "name": "trg_stores_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
+      { "name": "trg_merchants_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }
     ]
   }
 }

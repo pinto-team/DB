@@ -2,7 +2,7 @@
   "addresses": [
     {
       "id": "7f21a40b-55a8-a9e9-16ae-85b94d2c31a8",
-      "store_id": "5236a08a-083d-c7ef-c706-bd2db7409dba",
+      "merchant_id": "5236a08a-083d-c7ef-c706-bd2db7409dba",
       "country_id": "bed69525-a216-0f3e-7bce-00194ddc8250",
       "type": "other",
       "label": "Label Sample",
@@ -28,7 +28,7 @@
   "branches": [
     {
       "id": "fd4e9144-af61-ceed-f91f-b648f02898fc",
-      "store_id": "b9a394c5-b4f2-4971-fd37-77bd9f4e6076",
+      "merchant_id": "b9a394c5-b4f2-4971-fd37-77bd9f4e6076",
       "name": "Name Sample",
       "code": "Code Sample",
       "address_id": "d3ad76ee-90d5-b1a6-9dca-be6abc54358a",
@@ -98,7 +98,7 @@
     {
       "id": "22d6015c-b3c1-32bb-d941-97d4f3d12a9e",
       "customer_id": "6ce1bf64-a773-482d-a87f-d779b1fa5105",
-      "store_id": "30483d68-3217-bb6f-b9ec-d2eda024603e",
+      "merchant_id": "30483d68-3217-bb6f-b9ec-d2eda024603e",
       "branch_id": "39b1eb4c-bcad-e3e1-9d6f-b411e00af0e4",
       "currency": "IRR",
       "subtotal": 0,
@@ -133,7 +133,7 @@
   "commissions": [
     {
       "id": "88e83eb8-a73f-322b-0312-99275560ecbd",
-      "store_id": "e629af02-642d-dc42-85cf-09061869ea5c",
+      "merchant_id": "e629af02-642d-dc42-85cf-09061869ea5c",
       "type": "percent",
       "rate": 50,
       "tiers": [
@@ -159,7 +159,7 @@
   "compliance_documents": [
     {
       "id": "de8f3e70-a720-c49a-9b32-11b023c46c4d",
-      "store_id": "fe959e78-289b-0768-ed64-3aea4f9a2a54",
+      "merchant_id": "fe959e78-289b-0768-ed64-3aea4f9a2a54",
       "type": "business_license",
       "media_id": "87e03891-10e5-a108-678f-8152e132f64a",
       "number": "Number Sample",
@@ -177,7 +177,7 @@
   "contacts": [
     {
       "id": "a7c0bd1d-caa3-ddba-2733-421c080f949d",
-      "store_id": "517dcf52-c3cc-4dda-f164-430c9286df69",
+      "merchant_id": "517dcf52-c3cc-4dda-f164-430c9286df69",
       "type": "other",
       "email": "sample@example.com",
       "website": "https://example.com",
@@ -238,7 +238,7 @@
   "delivery_zones": [
     {
       "id": "47620f8c-2d5a-092a-fe2e-7189f102484d",
-      "store_id": "fa32ab81-ed48-f307-ca8e-dff2188c9fb9",
+      "merchant_id": "fa32ab81-ed48-f307-ca8e-dff2188c9fb9",
       "branch_id": "f5b4c8ec-13b6-0534-09f9-027ffd72f20e",
       "name": "Name Sample",
       "type": "polygon",
@@ -274,7 +274,7 @@
   "fees": [
     {
       "id": "d523208f-761a-494b-3065-c0df96b0b666",
-      "store_id": "b61edf15-29b9-7df5-43d8-6f11e9724263",
+      "merchant_id": "b61edf15-29b9-7df5-43d8-6f11e9724263",
       "name": "Name Sample",
       "type": "flat",
       "amount": 0,
@@ -296,7 +296,7 @@
   "fulfillments": [
     {
       "id": "d0ccb520-e6d9-1008-72ff-b12432d8c6c7",
-      "store_id": "542c6cd3-bd7f-bc39-92d9-9343718c9d46",
+      "merchant_id": "542c6cd3-bd7f-bc39-92d9-9343718c9d46",
       "branch_id": "1929af71-eeba-c14f-fa72-0520f8ea58c3",
       "delivery": {
         "enabled": true,
@@ -323,7 +323,7 @@
   "invoices": [
     {
       "id": "7152b53c-d3db-f9a8-9a3f-8342154b7b5e",
-      "store_id": "4051d609-6ed1-aa02-4c60-98c3801e69fa",
+      "merchant_id": "4051d609-6ed1-aa02-4c60-98c3801e69fa",
       "settlement_id": "2e10ce92-eebf-ce3c-7446-83cc0d8257b9",
       "invoice_number": "Invoice Number Sample",
       "issued_at": "2024-01-01T00:00:00Z",
@@ -342,7 +342,7 @@
   "item_availability": [
     {
       "id": "a943c28a-1f98-6b0a-894f-b1adc041e364",
-      "store_id": "57b71afa-ff81-e95a-f1ea-9b6f3c845ab2",
+      "merchant_id": "57b71afa-ff81-e95a-f1ea-9b6f3c845ab2",
       "item_id": "92ac29bf-7528-b1a0-17c1-a5b6d26aa1a2",
       "branch_id": "82d021a3-9105-4b91-9cc6-6b6a5f884de0",
       "day": "sat",
@@ -360,7 +360,7 @@
   "items": [
     {
       "id": "46f19595-3e4b-a858-d399-6ff3655eb345",
-      "store_id": "81d620b7-0df1-0d87-3b5b-ba0cc0560792",
+      "merchant_id": "81d620b7-0df1-0d87-3b5b-ba0cc0560792",
       "menu_id": "89578df0-a5e6-3974-c8e8-70210a6e5d97",
       "section_id": "2b7eb9ba-c60c-4d0a-ce03-32c20ac1625b",
       "product_id": "cbea6b2f-cf89-6cee-49e4-f5f02e62fc35",
@@ -401,7 +401,7 @@
   "media": [
     {
       "id": "0e673d44-d8fa-463a-8654-6be85b1cbff5",
-      "store_id": "9da8c4ba-9423-e9ae-c1ad-f9afec6a027d",
+      "merchant_id": "9da8c4ba-9423-e9ae-c1ad-f9afec6a027d",
       "type": "image",
       "url": "https://example.com",
       "alt": "Alt Sample",
@@ -419,7 +419,7 @@
   "menu_sections": [
     {
       "id": "904ad55b-b7b0-b5c4-d3c8-86cf6dfc562b",
-      "store_id": "378f8a34-c110-5199-d7ec-4298f4ba8c68",
+      "merchant_id": "378f8a34-c110-5199-d7ec-4298f4ba8c68",
       "menu_id": "1a01ea7e-c251-f353-645e-1803c045be00",
       "name": "Name Sample",
       "description": "Description Sample",
@@ -433,7 +433,7 @@
   "menus": [
     {
       "id": "0321c7db-23d1-d6a6-9633-550bad848e27",
-      "store_id": "15584f4f-b599-e3ce-1b86-e206f44035cc",
+      "merchant_id": "15584f4f-b599-e3ce-1b86-e206f44035cc",
       "branch_id": "eb296f2d-c2df-ec22-43c6-1796e21ae8dd",
       "name": "Name Sample",
       "description": "Description Sample",
@@ -451,7 +451,7 @@
   "modifier_groups": [
     {
       "id": "3c568c35-5ab6-2931-12a5-1037ffe56970",
-      "store_id": "c8ae6e55-fa36-e697-3217-c2507fff1f08",
+      "merchant_id": "c8ae6e55-fa36-e697-3217-c2507fff1f08",
       "name": "Name Sample",
       "selection_type": "single",
       "min_select": 0,
@@ -547,7 +547,7 @@
   "orders": [
     {
       "id": "68f1ffea-cb2f-7e9b-c27d-da14ef013b27",
-      "store_id": "a1297b62-1b36-1e4a-7a12-1ee072c580fd",
+      "merchant_id": "a1297b62-1b36-1e4a-7a12-1ee072c580fd",
       "customer_id": "37a73755-4ef4-8950-79c0-c8f7e30a2310",
       "branch_id": "8f30bd56-12fe-e470-c0fc-67453613de12",
       "cart_id": "805200c0-b25f-76b8-ecca-0377c5abbdc2",
@@ -571,7 +571,7 @@
   "payout_accounts": [
     {
       "id": "5ed2ce9f-d42f-5ee8-afaf-a9f8c67bb04f",
-      "store_id": "602eb955-11a2-62d3-d62d-c83a95bff612",
+      "merchant_id": "602eb955-11a2-62d3-d62d-c83a95bff612",
       "type": "bank",
       "provider": "Provider Sample",
       "account_holder_name": "Account Holder Name Sample",
@@ -592,7 +592,7 @@
   "phones": [
     {
       "id": "c44f8098-0820-81a0-f099-a3c304095177",
-      "store_id": "23a23b20-057c-6cde-f1d5-5f06ab18b544",
+      "merchant_id": "23a23b20-057c-6cde-f1d5-5f06ab18b544",
       "contact_id": "221e08e0-ed30-4491-5b5f-cbce8eda6f73",
       "label": "Label Sample",
       "country_code": "IR",
@@ -611,11 +611,11 @@
   "pos_integrations": [
     {
       "id": "95f72af5-6493-7dc3-4398-a5ab7f74095d",
-      "store_id": "7a5eca96-3ab3-8381-35c0-323417668894",
+      "merchant_id": "7a5eca96-3ab3-8381-35c0-323417668894",
       "branch_id": "9f5f9051-9a4c-06e6-6f59-4c1ff7a3993f",
       "provider": "square",
       "custom_provider": "Custom Provider Sample",
-      "external_store_id": "fc87a874-c405-139b-386f-88b29055d621",
+      "external_merchant_id": "fc87a874-c405-139b-386f-88b29055d621",
       "enabled": true,
       "sync_status": "success",
       "last_sync_at": "2024-01-01T00:00:00Z",
@@ -738,7 +738,7 @@
   "promotions": [
     {
       "id": "47c4fdf1-c7b7-7095-de7f-e5557522b7a3",
-      "store_id": "010c5843-a90f-3615-52f0-47916c98ce13",
+      "merchant_id": "010c5843-a90f-3615-52f0-47916c98ce13",
       "branch_id": "4698d522-ec70-f16e-d865-c8bfe9cf0448",
       "name": "Name Sample",
       "type": "percent_off",
@@ -784,7 +784,7 @@
   "reviews": [
     {
       "id": "1ded314f-34c6-3085-fd2a-54a1d4a83a1b",
-      "store_id": "48d04342-58ed-3283-4d60-6e0f148675f8",
+      "merchant_id": "48d04342-58ed-3283-4d60-6e0f148675f8",
       "branch_id": "dcafbb93-0548-3673-9b78-552df01a9409",
       "order_id": "7f090545-8ece-bc23-8f7f-a5ec076ef7a5",
       "user_id": "450b615b-f4f4-0e24-5a49-de8fc778d179",
@@ -807,7 +807,7 @@
   "schedule_exceptions": [
     {
       "id": "524ef434-b6a2-9e73-3e82-96583cf5f3c1",
-      "store_id": "19c53bbd-cb38-53fd-7dfd-74f2b75232dd",
+      "merchant_id": "19c53bbd-cb38-53fd-7dfd-74f2b75232dd",
       "schedule_id": "0999d7a0-71fd-3183-bbb0-ff865235ea78",
       "date": "Date Sample",
       "start": "Start Sample",
@@ -822,7 +822,7 @@
   "schedule_rules": [
     {
       "id": "16f8ede6-307a-86d2-2cdf-1ba0d45b2ec9",
-      "store_id": "1c723497-76cf-75c0-4141-2f5facc4641d",
+      "merchant_id": "1c723497-76cf-75c0-4141-2f5facc4641d",
       "schedule_id": "f46ab6ff-9f47-c996-8018-89e9b4d62288",
       "day": "sat",
       "start": "Start Sample",
@@ -837,7 +837,7 @@
   "schedules": [
     {
       "id": "cee4aec1-162c-801f-75ff-5000b8af7fb9",
-      "store_id": "a2013623-77f1-c357-0b34-ff7ed15f22eb",
+      "merchant_id": "a2013623-77f1-c357-0b34-ff7ed15f22eb",
       "branch_id": "32b92730-366c-4e0e-0920-b5d5a54427e1",
       "service": "delivery",
       "name": "Name Sample",
@@ -853,7 +853,7 @@
   "settlements": [
     {
       "id": "b71d71dd-6b34-f047-3e96-865a28fc3da3",
-      "store_id": "d9b66e3b-b3c3-b687-804f-770b6a4fb11c",
+      "merchant_id": "d9b66e3b-b3c3-b687-804f-770b6a4fb11c",
       "period_start": "2024-01-01",
       "period_end": "2024-01-01",
       "currency": "IRR",
@@ -872,11 +872,11 @@
       "deleted_at": "2024-01-01T00:00:00Z"
     }
   ],
-  "store_marketplace_mappings": [
+  "merchant_marketplace_mappings": [
     {
       "id": "03472b79-2f33-a2df-f0a2-15d8db7bb009",
-      "store_id": "186282f7-d5b9-53c1-5d0d-b141b3951dc5",
-      "store_product_id": "54fd85d5-500b-afcd-9e4a-19a044ed1e33",
+      "merchant_id": "186282f7-d5b9-53c1-5d0d-b141b3951dc5",
+      "merchant_product_id": "54fd85d5-500b-afcd-9e4a-19a044ed1e33",
       "marketplace": "snapp",
       "external_product_id": "0432d11c-d2a6-3414-a776-a744a302bfc8",
       "external_variant_id": "5fe43b07-462b-780d-0f13-53a0ae2aa77d",
@@ -890,17 +890,17 @@
       "updated_at": "2024-01-01T00:00:00Z"
     }
   ],
-  "store_products": [
+  "merchant_products": [
     {
       "id": "b14db591-1bbb-7faa-bd61-439e6eac2c2e",
-      "store_id": "694ce6f4-3e18-03b5-8ed3-a7ac41973109",
+      "merchant_id": "694ce6f4-3e18-03b5-8ed3-a7ac41973109",
       "variant_id": "fa682ed0-5990-0e80-419b-47f818f4d1fb",
-      "store_sku": "Store Sku Sample",
+      "merchant_sku": "Merchant Sku Sample",
       "is_listed": true,
       "availability_status": "in_stock",
       "channels": {
         "online": true,
-        "in_store": true
+        "in_merchant": true
       },
       "pricing": {
         "currency": "IRR",
@@ -939,10 +939,10 @@
       "deleted_at": "2024-01-01T00:00:00Z"
     }
   ],
-  "store_settings": [
+  "merchant_settings": [
     {
       "id": "26725ec6-837d-dd1b-1985-6d70609ba66d",
-      "store_id": "b925e893-97f2-3c12-38d2-d7e6cdec8c2c",
+      "merchant_id": "b925e893-97f2-3c12-38d2-d7e6cdec8c2c",
       "supports": {
         "delivery": true,
         "pickup": true,
@@ -972,7 +972,7 @@
       "deleted_at": "2024-01-01T00:00:00Z"
     }
   ],
-  "stores": [
+  "merchants": [
     {
       "id": "511958c5-4eff-6afb-8bb8-1fa429977e6c",
       "name": "Name Sample",
@@ -995,7 +995,7 @@
       "pos_integration_id": "bf18cd66-f34f-decb-4432-8516a33b9915",
       "commission_id": "9c778acd-3f96-18ae-c095-d71b2057b6f1",
       "payout_account_id": "8f7a2f8d-e779-70ce-9f14-ce521f5bab4a",
-      "store_settings_id": "e639c55a-79bd-0dfd-48c0-f03da74edd3b",
+      "merchant_settings_id": "e639c55a-79bd-0dfd-48c0-f03da74edd3b",
       "default_branch_id": "9c29ed2c-cc3e-7277-809f-0c5e6c556c27",
       "wallet_id": "0ad2cfd6-f23f-deff-7e21-90595c3d523d",
       "timezone": "Asia/Tehran",
@@ -1021,7 +1021,7 @@
   "transactions": [
     {
       "id": "7c3545b0-1a16-ee7a-eeae-fa95586b48a4",
-      "store_id": "9d2fe58e-342c-13a2-05ab-7dcbe843bb8e",
+      "merchant_id": "9d2fe58e-342c-13a2-05ab-7dcbe843bb8e",
       "settlement_id": "1c952e70-d885-6633-9add-6dd56bad7a39",
       "order_id": "aaa68d9b-56cf-e668-2bf7-663e83fd8a45",
       "type": "order_income",
@@ -1084,7 +1084,7 @@
   "wallets": [
     {
       "id": "afbb6987-e1f7-0506-c8c2-be47120fe0c4",
-      "store_id": "0db75d24-8585-dbc2-da2a-2ac9d9bb1d70",
+      "merchant_id": "0db75d24-8585-dbc2-da2a-2ac9d9bb1d70",
       "currency": "IRR",
       "balance": 0,
       "pending_balance": 0,
@@ -1131,7 +1131,7 @@
       "description": "Description Sample",
       "owner_type": "brand",
       "brand_id": "8b8473d6-08e5-7847-f9d5-d24653174e85",
-      "store_id": "099d8187-abd7-fbf6-41a7-0b1c8deb516d",
+      "merchant_id": "099d8187-abd7-fbf6-41a7-0b1c8deb516d",
       "address_id": "682c01f3-334a-35cc-9148-25a65cef339b",
       "contact_id": "f528f9bc-56a9-c09d-4437-6a83884cafb2",
       "timezone": "Asia/Tehran",

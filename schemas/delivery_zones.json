@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "branch_id": {
       "type": ["string", "null"],
@@ -100,15 +100,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "name", "type", "currency", "status"],
+  "required": ["merchant_id", "name", "type", "currency", "status"],
 
   "x-pg": {
     "table": "delivery_zones",
     "primaryKey": ["id"],
     "foreignKeys": [
       {
-        "columns": ["store_id"],
-        "references": { "table": "stores", "columns": ["id"] },
+        "columns": ["merchant_id"],
+        "references": { "table": "merchants", "columns": ["id"] },
         "onDelete": "CASCADE"
       },
       {
@@ -118,13 +118,13 @@
       }
     ],
     "indexes": [
-      { "name": "idx_delivery_zones_store", "columns": ["store_id"] },
+      { "name": "idx_delivery_zones_merchant", "columns": ["merchant_id"] },
       { "name": "idx_delivery_zones_branch", "columns": ["branch_id"] },
       { "name": "idx_delivery_zones_status", "columns": ["status"] },
       { "name": "idx_delivery_zones_type", "columns": ["type"] }
     ],
     "unique": [
-      { "columns": ["store_id", "name"], "where": "deleted_at IS NULL" }
+      { "columns": ["merchant_id", "name"], "where": "deleted_at IS NULL" }
     ],
     "triggers": [
       { "name": "trg_delivery_zones_set_updated_at", "timing": "BEFORE", "event": "UPDATE", "function": "set_updated_at()" }

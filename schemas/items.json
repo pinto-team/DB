@@ -7,10 +7,10 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "store_id": {
+    "merchant_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → stores.id"
+      "description": "FK → merchants.id"
     },
     "menu_id": {
       "type": "string",
@@ -95,13 +95,13 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["store_id", "menu_id", "name", "price", "status"],
+  "required": ["merchant_id", "menu_id", "name", "price", "status"],
 
   "x-pg": {
     "table": "items",
     "primaryKey": ["id"],
     "foreignKeys": [
-      { "columns": ["store_id"], "references": { "table": "stores", "columns": ["id"] }, "onDelete": "CASCADE" },
+      { "columns": ["merchant_id"], "references": { "table": "merchants", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["menu_id"], "references": { "table": "menus", "columns": ["id"] }, "onDelete": "CASCADE" },
       { "columns": ["section_id"], "references": { "table": "menu_sections", "columns": ["id"] }, "onDelete": "SET NULL" },
       { "columns": ["product_id"], "references": { "table": "products", "columns": ["id"] }, "onDelete": "SET NULL" },
@@ -109,7 +109,7 @@
       { "columns": ["image_media_id"], "references": { "table": "media", "columns": ["id"] }, "onDelete": "SET NULL", "onUpdate": "CASCADE" }
     ],
     "indexes": [
-      { "name": "idx_items_store", "columns": ["store_id"] },
+      { "name": "idx_items_merchant", "columns": ["merchant_id"] },
       { "name": "idx_items_menu", "columns": ["menu_id"] },
       { "name": "idx_items_section", "columns": ["section_id"] },
       { "name": "idx_items_status", "columns": ["status"] },
