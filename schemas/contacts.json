@@ -7,39 +7,28 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "merchant_id": {
+    "owner_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Type of entity that owns the contact (e.g., merchant, branch, warehouse)"
+    },
+    "owner_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → merchants.id"
+      "description": "Identifier of the owning entity"
     },
-    "type": {
-      "type": "string",
-      "enum": ["main", "support", "manager", "other"],
-      "default": "other"
-    },
+    "name": { "type": ["string", "null"], "maxLength": 255 },
     "email": {
       "type": ["string", "null"],
       "format": "email",
       "maxLength": 255
     },
-    "website": {
+    "role": {
       "type": ["string", "null"],
-      "format": "uri"
+      "maxLength": 128,
+      "description": "Role or job title of the contact"
     },
-    "social": {
-      "type": ["array", "null"],
-      "description": "List of social media links",
-      "items": {
-        "type": "object",
-        "properties": {
-          "platform": { "type": "string" },
-          "url": { "type": ["string", "null"], "format": "uri" }
-        },
-        "required": ["platform"],
-        "additionalProperties": false
-      }
-    },
-    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
+    "is_primary": { "type": "boolean", "default": false },
     "status": {
       "type": "string",
       "enum": ["active", "inactive"],
@@ -50,22 +39,15 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["merchant_id", "type", "status"],
+  "required": ["owner_type", "owner_id", "status"],
 
   "x-pg": {
     "table": "contacts",
     "primaryKey": ["id"],
-    "foreignKeys": [
-      {
-        "columns": ["merchant_id"],
-        "references": { "table": "merchants", "columns": ["id"] },
-        "onDelete": "CASCADE"
-      }
-    ],
     "indexes": [
-      { "name": "idx_contacts_merchant", "columns": ["merchant_id"] },
-      { "name": "idx_contacts_type", "columns": ["type"] },
+      { "name": "idx_contacts_owner", "columns": ["owner_type", "owner_id"] },
       { "name": "idx_contacts_status", "columns": ["status"] },
+      { "name": "idx_contacts_is_primary", "columns": ["is_primary"] },
       { "name": "idx_contacts_email", "expression": "lower(email)" }
     ],
     "triggers": [

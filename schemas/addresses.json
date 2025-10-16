@@ -7,10 +7,15 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "merchant_id": {
-      "type": ["string", "null"],
+    "owner_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Type of entity that owns the address (e.g., merchant, branch, order)"
+    },
+    "owner_id": {
+      "type": "string",
       "format": "uuid",
-      "description": "FK → merchants.id"
+      "description": "Identifier of the owning entity"
     },
     "country_id": {
       "type": "string",
@@ -53,17 +58,12 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["country_id", "type", "label", "street", "status"],
+  "required": ["owner_type", "owner_id", "country_id", "type", "label", "street", "status"],
 
   "x-pg": {
     "table": "addresses",
     "primaryKey": ["id"],
     "foreignKeys": [
-      {
-        "columns": ["merchant_id"],
-        "references": { "table": "merchants", "columns": ["id"] },
-        "onDelete": "CASCADE"
-      },
       {
         "columns": ["country_id"],
         "references": { "table": "countries", "columns": ["id"] },
@@ -71,8 +71,8 @@
       }
     ],
     "indexes": [
+      { "name": "idx_addresses_owner", "columns": ["owner_type", "owner_id"] },
       { "name": "idx_addresses_country", "columns": ["country_id"] },
-      { "name": "idx_addresses_merchant", "columns": ["merchant_id"] },
       { "name": "idx_addresses_status", "columns": ["status"] },
       { "name": "idx_addresses_geo", "using": "GIST", "expression": "ll_to_earth(latitude, longitude)" }
     ],
