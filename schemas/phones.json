@@ -7,15 +7,15 @@
 
   "properties": {
     "id": { "type": "string", "format": "uuid", "readOnly": true },
-    "merchant_id": {
+    "owner_type": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Type of entity that owns the phone number (e.g., merchant, customer, order)"
+    },
+    "owner_id": {
       "type": "string",
       "format": "uuid",
-      "description": "FK → merchants.id"
-    },
-    "contact_id": {
-      "type": ["string", "null"],
-      "format": "uuid",
-      "description": "FK → contacts.id"
+      "description": "Identifier of the owning entity"
     },
     "label": { "type": "string", "minLength": 1, "description": "Label (e.g., Support, Sales)" },
     "country_code": {
@@ -28,15 +28,14 @@
       "pattern": "^[0-9]{5,15}$",
       "description": "Phone number (digits only)"
     },
-    "is_primary": { "type": "boolean", "default": false },
     "type": {
       "type": "string",
       "enum": ["mobile", "landline", "whatsapp", "support", "manager", "fax", "emergency", "sales"],
       "default": "mobile"
     },
+    "is_primary": { "type": "boolean", "default": false },
     "is_verified": { "type": "boolean", "default": false },
     "verified_at": { "type": ["string", "null"], "format": "date-time" },
-    "timezone": { "type": ["string", "null"], "description": "e.g., Asia/Tehran" },
     "status": {
       "type": "string",
       "enum": ["active", "inactive", "suspended"],
@@ -47,29 +46,16 @@
     "deleted_at": { "type": ["string", "null"], "format": "date-time", "readOnly": true }
   },
 
-  "required": ["merchant_id", "label", "number", "type", "status"],
+  "required": ["owner_type", "owner_id", "label", "number", "type", "status"],
 
   "x-pg": {
     "table": "phones",
     "primaryKey": ["id"],
-    "foreignKeys": [
-      {
-        "columns": ["merchant_id"],
-        "references": { "table": "merchants", "columns": ["id"] },
-        "onDelete": "CASCADE"
-      },
-      {
-        "columns": ["contact_id"],
-        "references": { "table": "contacts", "columns": ["id"] },
-        "onDelete": "SET NULL"
-      }
-    ],
     "unique": [
-      { "columns": ["merchant_id", "number", "type"], "where": "deleted_at IS NULL" }
+      { "columns": ["owner_type", "owner_id", "number", "type"], "where": "deleted_at IS NULL" }
     ],
     "indexes": [
-      { "name": "idx_phones_merchant", "columns": ["merchant_id"] },
-      { "name": "idx_phones_contact", "columns": ["contact_id"] },
+      { "name": "idx_phones_owner", "columns": ["owner_type", "owner_id"] },
       { "name": "idx_phones_type", "columns": ["type"] },
       { "name": "idx_phones_status", "columns": ["status"] },
       { "name": "idx_phones_is_primary", "columns": ["is_primary"] }
